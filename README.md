@@ -1,2 +1,2 @@
-# Chess_AI
-Chess AI
+# Chess AI
+----------------------
