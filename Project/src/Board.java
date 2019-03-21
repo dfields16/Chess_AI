@@ -1,17 +1,17 @@
 
 public class Board {
-    public static String wPawn = "♙";
-    public static String wRook = "♖";
-    public static String wKnight = "♘";
-    public static String wBishop = "♗";
-    public static String wQueen = "♕";
-    public static String wKing = "♔";
-    public static String bPawn = "♟";
-    public static String bRook = "♜";
-    public static String bKnight = "♞";
-    public static String bBishop = "♝";
-    public static String bQueen = "♛";
-    public static String bKing = "♚";
+    public static final String wPawn = "♙";
+    public static final String wRook = "♖";
+    public static final String wKnight = "♘";
+    public static final String wBishop = "♗";
+    public static final String wQueen = "♕";
+    public static final String wKing = "♔";
+    public static final String bPawn = "♟";
+    public static final String bRook = "♜";
+    public static final String bKnight = "♞";
+    public static final String bBishop = "♝";
+    public static final String bQueen = "♛";
+    public static final String bKing = "♚";
 
     String[][] state;
     
