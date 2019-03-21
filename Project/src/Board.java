@@ -35,10 +35,10 @@ public class Board {
     }
 
     public void print(){
-        System.out.println("┌───────┬───────┬───────┬───────┬───────┬───────┬───────┬───────┐");
+        System.out.println("╔═══════╤═══════╤═══════╤═══════╤═══════╤═══════╤═══════╤═══════╗");
         for(int x = 0; x < state.length; x++){
-            String line = "│";
-            String border = "├───────";
+            String line = "║";
+            String border = "╟───────";
             for(int y = 0; y < state[x].length; y++){
                 if(state[x][y] == ""){
                     line += "\t│";
@@ -47,10 +47,10 @@ public class Board {
                 }
                 if(y != state[x].length-1)border += "┼───────";
             }
-            border += "┤";
-            System.out.println(line);
+            border += "╢";
+            System.out.println(line.substring(0, line.length()-1) + "║");
             if(x != state.length -1)System.out.println(border);
-            else System.out.println("└───────┴───────┴───────┴───────┴───────┴───────┴───────┴───────┘");
+            else System.out.println("╚═══════╧═══════╧═══════╧═══════╧═══════╧═══════╧═══════╧═══════╝");
 
         }
     }
