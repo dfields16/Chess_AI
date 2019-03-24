@@ -114,11 +114,13 @@ class Board extends JPanel {
   // LOAD CHESS PIECES
   public void loadPieces() {
     Piece[] pcs = currentState.toGUI();
-    for(int i = 0; i < pcs.length; i++){
-        pieces[i] = pcs[i];
-        pieces[i].square = i;
-        if(pcs[i].type != ChessPiece.EMPTY) squares[i].piece = i;
-        else squares[i].piece = -1;
+    for (int i = 0; i < pcs.length; i++) {
+      pieces[i] = pcs[i];
+      pieces[i].square = i;
+      if (pcs[i].type != ChessPiece.EMPTY)
+        squares[i].piece = i;
+      else
+        squares[i].piece = -1;
     }
 
   }
