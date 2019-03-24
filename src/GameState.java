@@ -30,14 +30,14 @@ public class GameState {
                     ChessPiece t = tOrder[x];
                     if (y == 1)
                         t = ChessPiece.PAWN;
-                    p = new Piece(t, Color.BLACK, y * state[y].length + x);
+                    p = new Piece(t, Color.BLACK);
                 } else if (y > 5) {
                     ChessPiece t = bOrder[x];
                     if (y == 6)
                         t = ChessPiece.PAWN;
-                    p = new Piece(t, Color.WHITE, y * state[y].length + x);
+                    p = new Piece(t, Color.WHITE);
                 } else {
-                    p = new Piece(ChessPiece.EMPTY, Color.RED, -1);
+                    p = new Piece(ChessPiece.EMPTY, Color.RED);
                 }
                 state[y][x] = p;
             }
@@ -59,7 +59,7 @@ public class GameState {
     public void clear() {
         for (int y = 0; y < state.length; y++) {
             for (int x = 0; x < state[y].length; x++) {
-                state[y][x] = new Piece(ChessPiece.EMPTY, Color.red, -1);
+                state[y][x] = new Piece(ChessPiece.EMPTY, Color.red);
             }
         }
     }

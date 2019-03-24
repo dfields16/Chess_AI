@@ -16,8 +16,7 @@ class Piece {
   Integer square;
   boolean isChecked, hasMoved;
 
-  public Piece(ChessPiece p, Color c, int s) {
-    square = s;
+  public Piece(ChessPiece p, Color c) {
     color = c;
     type = p;
     if (p == ChessPiece.EMPTY)
