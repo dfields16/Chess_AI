@@ -32,7 +32,7 @@ class Board extends JPanel {
     loadPieces();
     gameListener();
   }
-
+  
   // DRAW
   @Override
   protected void paintComponent(Graphics g) {
