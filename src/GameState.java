@@ -53,7 +53,6 @@ public class GameState {
             int x = loc % 8;
             state[y][x] = pieces[i];
         }
-        // print();
     }
 
     public void clear() {

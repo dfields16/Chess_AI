@@ -32,7 +32,7 @@ class Board extends JPanel {
     loadPieces();
     gameListener();
   }
-  
+
   // DRAW
   @Override
   protected void paintComponent(Graphics g) {
@@ -108,7 +108,9 @@ class Board extends JPanel {
     pieces[squares[clickStart].piece].square = clickEnd;
     squares[clickEnd].piece = squares[clickStart].piece;
     squares[clickStart].piece = -1;
+    //Update Current State
     currentState.update(pieces);
+    currentState.print();
   }
 
   // LOAD CHESS PIECES

@@ -23,7 +23,6 @@ class Piece {
       return;
     try {
       String imgPath = "./img/" + ((color == Color.BLACK) ? 'b' : 'w') + "_" + type.name().toLowerCase() + ".png";
-      // System.out.println(imgPath);
       icon = ImageIO.read(new File(imgPath));
     } catch (IOException e) {
       e.printStackTrace();
