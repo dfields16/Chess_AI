@@ -88,4 +88,37 @@ public class GameState {
 
         }
     }
+
+    public String serialize() {
+        String dat = "";
+        for (int y = 0; y < state.length; y++) {
+            for (int x = 0; x < state.length; x++) {
+                Piece p = state[y][x];
+                dat += p.type.toString() + ":" + ((p.color == Color.BLACK) ? "WHITE" : "BLACK") + ":" + toPoint(x, y)
+                        + ":" + p.hasMoved + ",";
+            }
+        }
+        return dat.substring(0, dat.length() - 2);
+    }
+
+    private String toPoint(int x, int y) {
+        String tmp = "";
+        tmp += (char) ('A' + y);
+        tmp += x;
+        return tmp;
+    }
+
+    public static GameState deserialize(String str) {
+        GameState dState = new GameState();
+        dState.clear();
+        for (String s : str.split(",")) {
+            String[] dat = s.split(":");
+            Piece p = new Piece(ChessPiece.valueOf(dat[0]), ((dat[1].equals("WHITE")) ? Color.BLACK : Color.WHITE));
+            //p.hasMoved = dat[3].from;
+            int x = (int)dat[2].charAt(1) - '0';
+            int y = (int)dat[2].charAt(0) - 'A';
+            dState.state[y][x] = p;
+        }
+        return dState;
+    }
 }

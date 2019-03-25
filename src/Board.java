@@ -1,9 +1,11 @@
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.JPanel;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 class Board extends JPanel {
@@ -22,6 +24,7 @@ class Board extends JPanel {
   int chosen = -1;
   boolean valid = false;
 
+
   // CONSTRUCTOR
   public Board() {
     currentState = new GameState();
@@ -31,6 +34,8 @@ class Board extends JPanel {
     loadSquares();
     loadPieces();
     gameListener();
+
+    
   }
 
   // DRAW
@@ -104,13 +109,26 @@ class Board extends JPanel {
     }
   }
 
+
+  
   public void movePiece(int clickStart, int clickEnd) {
     pieces[squares[clickStart].piece].square = clickEnd;
     squares[clickEnd].piece = squares[clickStart].piece;
     squares[clickStart].piece = -1;
     // Update Current State
     currentState.update(pieces);
-    currentState.print();
+    // currentState.print();
+    try{
+      if(Main.client != null){
+        Main.client.sendData(currentState.serialize());
+      }
+      if(Main.server != null){
+        Main.server.sendData(currentState.serialize());
+      }
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+    
   }
 
   // LOAD CHESS PIECES
