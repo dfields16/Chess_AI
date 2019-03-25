@@ -11,7 +11,7 @@ public class Main {
   static TCPServer server = null;
 
   public static void main(String[] args) throws IOException {
-    Board board = new Board();
+    Game board = new Game();
 
     JFrame frame = new JFrame("Chess Master");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

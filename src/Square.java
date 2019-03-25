@@ -1,23 +1,23 @@
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
 class Square {
 
-  int id, x, y, size;
-  int piece = -1;
-  String coord;
-  Color color;
+  int size = 75;
+  int offx = 100;
+  int offy = 100;
+
+  String id;
+  int col, row;
+
+  Piece piece = null;
   Shape shape;
 
-  public Square(int i, String n, int h, int v, int d, Color r) {
+  public Square(String i, int c, int r) {
     id = i;
-    coord = n;
-    x = h;
-    y = v;
-    size = d;
-    color = r;
-    shape = new Rectangle.Double(x, y, size, size);
+    col = c;
+    row = r;
+    shape = new Rectangle.Double((offx + c * size), (offy + r * size), size, size);
   }
 
 }

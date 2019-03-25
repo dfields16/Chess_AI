@@ -30,14 +30,15 @@ public class GameState {
                     ChessPiece t = tOrder[x];
                     if (y == 1)
                         t = ChessPiece.PAWN;
-                    p = new Piece(t, Color.BLACK);
+                    p = new Piece(t, 1);
                 } else if (y > 5) {
                     ChessPiece t = bOrder[x];
                     if (y == 6)
                         t = ChessPiece.PAWN;
-                    p = new Piece(t, Color.WHITE);
+                    p = new Piece(t, 0);
                 } else {
-                    p = new Piece(ChessPiece.EMPTY, Color.RED);
+                    //p = new Piece(ChessPiece.EMPTY, -1);
+                    p = null;
                 }
                 state[y][x] = p;
             }
@@ -45,14 +46,11 @@ public class GameState {
         return state;
     }
 
-    public void update(Piece[] pieces) {
+    public void update(Square[][] squares) {
         clear();
-        for (int i = 0; i < pieces.length; i++) {
-            if (pieces[i].type != ChessPiece.EMPTY) {
-                int loc = pieces[i].square;
-                int y = (int) Math.floor(loc / 8);
-                int x = loc % 8;
-                state[y][x] = pieces[i];
+        for (int y = 0; y < squares.length; y++) {
+            for (int x = 0; x < squares.length; x++) {
+                state[y][x] = squares[y][x].piece;
             }
         }
     }
@@ -60,7 +58,7 @@ public class GameState {
     public void clear() {
         for (int y = 0; y < state.length; y++) {
             for (int x = 0; x < state[y].length; x++) {
-                state[y][x] = new Piece(ChessPiece.EMPTY, Color.red);
+                state[y][x] = new Piece(ChessPiece.EMPTY, -1);
             }
         }
     }
@@ -94,8 +92,8 @@ public class GameState {
         for (int y = 0; y < state.length; y++) {
             for (int x = 0; x < state.length; x++) {
                 Piece p = state[y][x];
-                dat += p.type.toString() + ":" + ((p.color == Color.BLACK) ? "WHITE" : "BLACK") + ":" + toPoint(x, y)
-                        + ":" + p.hasMoved + ",";
+                dat += p.type.toString() + ":" + ((p.side == 0) ? "WHITE" : "BLACK") + ":" + toPoint(x, y)
+                        + ":" + p.moved + ",";
             }
         }
         return dat.substring(0, dat.length() - 2);
@@ -113,7 +111,7 @@ public class GameState {
         dState.clear();
         for (String s : str.split(",")) {
             String[] dat = s.split(":");
-            Piece p = new Piece(ChessPiece.valueOf(dat[0]), ((dat[1].equals("WHITE")) ? Color.BLACK : Color.WHITE));
+            Piece p = new Piece(ChessPiece.valueOf(dat[0]), ((dat[1].equals("WHITE")) ? 0 : 1));
             //p.hasMoved = dat[3].from;
             int x = (int)dat[2].charAt(1) - '0';
             int y = (int)dat[2].charAt(0) - 'A';
