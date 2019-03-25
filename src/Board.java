@@ -108,7 +108,7 @@ class Board extends JPanel {
     pieces[squares[clickStart].piece].square = clickEnd;
     squares[clickEnd].piece = squares[clickStart].piece;
     squares[clickStart].piece = -1;
-    //Update Current State
+    // Update Current State
     currentState.update(pieces);
     currentState.print();
   }

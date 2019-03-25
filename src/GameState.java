@@ -48,10 +48,12 @@ public class GameState {
     public void update(Piece[] pieces) {
         clear();
         for (int i = 0; i < pieces.length; i++) {
-            int loc = pieces[i].square;
-            int y = (int) Math.floor(loc / 8);
-            int x = loc % 8;
-            state[y][x] = pieces[i];
+            if (pieces[i].type != ChessPiece.EMPTY) {
+                int loc = pieces[i].square;
+                int y = (int) Math.floor(loc / 8);
+                int x = loc % 8;
+                state[y][x] = pieces[i];
+            }
         }
     }
 
