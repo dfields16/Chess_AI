@@ -58,7 +58,7 @@ public class GameState {
     public void clear() {
         for (int y = 0; y < state.length; y++) {
             for (int x = 0; x < state[y].length; x++) {
-                state[y][x] = new Piece(ChessPiece.EMPTY, -1);
+                state[y][x] = null;
             }
         }
     }
