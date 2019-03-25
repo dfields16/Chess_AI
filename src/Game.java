@@ -243,7 +243,7 @@ class Game extends JPanel {
   public void loadPieces() {
     for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
-        String id = String.valueOf(x) + String.valueOf(y);
+        //String id = String.valueOf(x) + String.valueOf(y);
         board[y][x].piece = currentState.state[y][x];
       }
     }

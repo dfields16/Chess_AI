@@ -1,5 +1,3 @@
-import java.awt.Color;
-
 public class GameState {
     public Piece[][] state;
     private static ChessPiece[] tOrder = { ChessPiece.ROOK, ChessPiece.KNIGHT, ChessPiece.BISCHOP, ChessPiece.QUEEN,
