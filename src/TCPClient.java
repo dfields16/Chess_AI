@@ -7,6 +7,7 @@ public class TCPClient {
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private Socket connection;
+	private boolean status = false;
 
 	public TCPClient(InetAddress ip, int port) throws IOException {
 		IPAddress = ip;
@@ -16,32 +17,50 @@ public class TCPClient {
 		output = new ObjectOutputStream(connection.getOutputStream());
 		output.flush();
 		input = new ObjectInputStream(connection.getInputStream());
-
+		status = true;
 	}
 
-	public void sendData(String data) throws IOException {
-		output.writeObject(data);
+	public void sendData(String data) {
+		try{
+			output.writeObject(data);
 		output.flush();
-
+		}catch (IOException ioeException){
+			ioeException.printStackTrace();
+		}
 	}
 
-	public String recieveData() throws IOException {
+	public String recieveData() {
 		String temp = "An Error Occurred while recieving data!";
 		try {
 			temp = (String) input.readObject();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Connection Broken");
+			status = false;
+			close();
 		}
 		return temp;
 	}
 
-	public void close() throws IOException {
-		output.close();
-		input.close();
-		connection.close();
+	public void close() {
+		try {
+			output.close();
+			input.close();
+			connection.close();
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
 	}
 
-	public void flush() throws IOException {
-		output.flush();
+	public void flush() {
+		try {
+			output.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+
+	public boolean isActive() {
+		return status;
+	}
+
 }

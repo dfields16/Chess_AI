@@ -7,52 +7,78 @@ class TCPServer {
 	private static ObjectInputStream input;
 	private ServerSocket serverSocket;
 	private Socket connection;
+	private boolean status = false;
 
 	public TCPServer(int port) throws IOException {
 		port1 = port;
 		serverSocket = new ServerSocket(port1);
 	}
 
-	public String recieveData() throws IOException {
+	public String recieveData() {
 		String temp = "An Error Occurred while recieving data!";
 		try {
 			temp = (String) input.readObject();
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Connection Broken");
+			close();
 		}
 		return temp;
 	}
 
-	public void sendData(String data) throws IOException {
+	public void sendData(String data) {
 		try {
 			output.writeObject(data);
 			output.flush();
 		} catch (IOException ioException) {
+			System.out.println("Connection Broken");
 			ioException.printStackTrace();
 		}
 	}
 
-	public void waitForConnection() throws IOException {
+	public void waitForConnection() {
 		System.out.println("Waiting for a connection...");
-		connection = serverSocket.accept();
-		System.out.println("Connected to: " + connection.getInetAddress().getHostName());
-		connection.setTcpNoDelay(true);
+		try {
+			connection = serverSocket.accept();
+			System.out.println("Connected to: " + connection.getInetAddress().getHostName());
+			connection.setTcpNoDelay(true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void setupStreams() throws IOException {
-		System.out.println("Setting up streams");
-		output = new ObjectOutputStream(connection.getOutputStream());
-		output.flush();
-		input = new ObjectInputStream(connection.getInputStream());
+	public void setupStreams() {
+		try {
+			System.out.println("Setting up streams");
+			output = new ObjectOutputStream(connection.getOutputStream());
+			output.flush();
+			input = new ObjectInputStream(connection.getInputStream());
+			status = true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
-	public void close() throws IOException {
-		output.close();
-		connection.close();
-		input.close();
+	public void close() {
+		try {
+			output.close();
+			connection.close();
+			input.close();
+			status = false;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void flush() throws IOException {
-		output.flush();
+	public void flush() {
+		try {
+			output.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean isActive() {
+		return status;
 	}
 }

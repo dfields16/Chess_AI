@@ -29,7 +29,7 @@ public class Main {
       if (JOptionPane.showConfirmDialog(null, "Are you the host?", "Networking",
           JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
         // Connect to game
-        String ip = JOptionPane.showInputDialog("Enter an IP address: ", "192.168.88.146");
+        String ip = JOptionPane.showInputDialog("Enter an IP address: ", "localhost");
         client = new TCPClient(InetAddress.getByName(ip), 60183);
       } else {
         // Host Game
@@ -43,18 +43,16 @@ public class Main {
         @Override
         public void run() {
           try {
-            if (server != null) {
+            if (server != null && server.isActive()) {
               board.currentState = GameState.deserialize(server.recieveData());
               board.loadPieces();
             }
-            if (client != null){
+            if (client != null && client.isActive()) {
               board.currentState = GameState.deserialize(client.recieveData());
               board.loadPieces();
             }
             board.updateUI();
-            System.out.print(".");
-          } catch (IOException e) {
-            e.printStackTrace();
+          } catch (Exception e) {
           }
         }
       };
