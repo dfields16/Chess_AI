@@ -44,12 +44,20 @@ public class Main {
         public void run() {
           try {
             if (server != null && server.isActive()) {
-              board.currentState = GameState.deserialize(server.recieveData());
-              board.loadPieces();
+              GameState state = GameState.deserialize(server.recieveData());
+              if(!state.equals(board.currentState)){
+                board.currentState = state;
+                board.loadPieces();  
+                board.turn = (board.turn == 1) ? 0 : 1;
+              }
             }
             if (client != null && client.isActive()) {
-              board.currentState = GameState.deserialize(client.recieveData());
-              board.loadPieces();
+              GameState state = GameState.deserialize(client.recieveData());
+              if(!state.equals(board.currentState)){
+                board.currentState = state;
+                board.loadPieces();  
+                board.turn = (board.turn == 1) ? 0 : 1;
+              }
             }
             board.updateUI();
           } catch (Exception e) {

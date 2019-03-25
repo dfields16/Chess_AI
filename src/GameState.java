@@ -92,6 +92,7 @@ public class GameState {
         for (int y = 0; y < state.length; y++) {
             for (int x = 0; x < state.length; x++) {
                 Piece p = state[y][x];
+                if(p == null)p = new Piece(ChessPiece.EMPTY, -1);
                 dat += p.type.toString() + ":" + ((p.side == 0) ? "WHITE" : "BLACK") + ":" + toPoint(x, y)
                         + ":" + p.moved + ",";
             }
@@ -115,8 +116,13 @@ public class GameState {
             //p.hasMoved = dat[3].from;
             int x = (int)dat[2].charAt(1) - '0';
             int y = (int)dat[2].charAt(0) - 'A';
+            if(p.type == ChessPiece.EMPTY)p = null;
             dState.state[y][x] = p;
         }
         return dState;
+    }
+
+    public boolean equals(GameState s){
+        return this.serialize().equals(s.serialize());
     }
 }
