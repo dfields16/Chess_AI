@@ -48,7 +48,7 @@ public class AI {
         for (int y = 0; y < state.length; y++) {
             for (int x = 0; x < state.length; x++) {
                 Piece p = state[y][x].piece;
-                if(p == null)p = new Piece(ChessPiece.PAWN, -1);
+                if(p == null)p = new Piece(ChessPiece.EMPTY, -1);
                 dat += p.type.toString() + ":" + ((p.side == 0) ? "WHITE" : "BLACK") + ":" + toPoint(x, y)
                         + ":" + p.moved + ",";
             }
@@ -72,7 +72,10 @@ public class AI {
             //p.hasMoved = dat[3].from;
             int x = (int)dat[2].charAt(1) - '0';
             int y = (int)dat[2].charAt(0) - 'A';
-            dState.state[y][x].piece = p;
+
+            Square s = new Square(String.valueOf(x) + String.valueOf(y), x, y);
+            s.piece = p;
+            dState.state[y][x] = s;
         }
         return dState;
     }
