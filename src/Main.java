@@ -12,7 +12,7 @@ public class Main {
   static TCPServer server = null;
 
   public static void main(String[] args) throws IOException {
-    Game gameManager = new Game();
+    Game board = new Game();
 
     JFrame frame = new JFrame("Chess Master");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -20,7 +20,7 @@ public class Main {
     frame.setResizable(false);
     frame.setBackground(Color.decode("#003300"));
 
-    frame.add(gameManager);
+    frame.add(board);
 
     frame.setVisible(true);
 
@@ -47,21 +47,21 @@ public class Main {
           try {
             if (server != null && server.isActive()) {
               AI state = AI.deserialize(server.recieveData());
-              if(!state.equals(gameManager.currentState)){
-                gameManager.currentState = state;
-                gameManager.loadSquares();  
-                gameManager.turn = (gameManager.turn == 1) ? 0 : 1;
+              if(!state.equals(board.currentState)){
+                board.currentState = state;
+                board.loadPieces();  
+                board.turn = (board.turn == 1) ? 0 : 1;
               }
             }
             if (client != null && client.isActive()) {
               AI state = AI.deserialize(client.recieveData());
-              if(!state.equals(gameManager.currentState)){
-                gameManager.currentState = state;
-                gameManager.loadSquares();  
-                gameManager.turn = (gameManager.turn == 1) ? 0 : 1;
+              if(!state.equals(board.currentState)){
+                board.currentState = state;
+                board.loadPieces();  
+                board.turn = (board.turn == 1) ? 0 : 1;
               }
             }
-            gameManager.updateUI();
+            board.updateUI();
           } catch (Exception e) {
           }
         }

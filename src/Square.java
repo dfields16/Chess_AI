@@ -20,8 +20,4 @@ class Square {
     shape = new Rectangle.Double((offx + c * size), (offy + r * size), size, size);
   }
 
-  public void setPiece(Piece p){
-    piece = p;
-  }
-
 }
