@@ -44,7 +44,7 @@ public class Main {
         public void run() {
           try {
             if (server != null && server.isActive()) {
-              AI state = AI.deserialize(server.recieveData());
+              GameState state = GameState.deserialize(server.recieveData());
               if(!state.equals(board.currentState)){
                 board.currentState = state;
                 board.loadSquares();
@@ -52,7 +52,7 @@ public class Main {
               }
             }
             if (client != null && client.isActive()) {
-              AI state = AI.deserialize(client.recieveData());
+              GameState state = GameState.deserialize(client.recieveData());
               if(!state.equals(board.currentState)){
                 board.currentState = state;
                 board.loadSquares();
