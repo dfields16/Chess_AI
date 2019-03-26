@@ -16,7 +16,7 @@ class Game extends JPanel {
 
   BufferedImage ui, icon;
 
-  GameState currentState;
+  AI currentState;
 
   // MULTIARRAY
   Square[][] board = new Square[8][8];
@@ -27,7 +27,7 @@ class Game extends JPanel {
 
   // CONSTRUCTOR
   public Game() {
-    currentState = new GameState();
+    currentState = new AI();
     setLayout(null);
 
     loadSquares();
@@ -35,17 +35,18 @@ class Game extends JPanel {
     gameListener();
   }
 
-  // DRAW GRAPHICS
+  // GUI
   @Override
   protected void paintComponent(Graphics g) {
     Graphics2D g2 = (Graphics2D) g;
-
+    
+    // DRAW BACKGROUND
     try {
       ui = ImageIO.read(new File("./img/bg/wood.png"));
     } catch (IOException e) {
       e.printStackTrace();
     }
-    // DRAW BACKGROUND
+
     g.drawImage(ui, 0, 0, null);
     try {
       ui = ImageIO.read(new File("./img/bg/trim.png"));
@@ -72,27 +73,26 @@ class Game extends JPanel {
       g2.setColor(Color.decode("#ffffff"));
       g2.drawString(String.valueOf(rowh), board[0][0].offx - 16, board[0][0].offy + 48 + (y * board[0][0].size));
 
-      for (int x = 0; x < 8; x++) {
+    for (int x = 0; x < 8; x++) {
 
-        if (y == 0) {
-          // HEADING X
-          g2.setColor(Color.decode("#111111"));
-          g2.fillRect(board[0][0].offx + x * board[0][0].size, board[0][0].offy - 25, board[0][0].size, 25);
-          g2.setColor(Color.decode("#ffffff"));
-          g2.drawString(String.valueOf(colh), board[0][0].offx + 34 + (x * board[0][0].size), board[0][0].offy - 8);
-        }
-
-        g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
-        if (board[y][x].id == clickStart)
-          g2.setColor(Color.decode("#003366"));
-        g2.fill(board[y][x].shape);
-
-        toggle = toggle == 0 ? 1 : 0;
-        colh++;
+      if (y == 0) {
+        // HEADING X
+        g2.setColor(Color.decode("#111111"));
+        g2.fillRect(board[0][0].offx + x * board[0][0].size, board[0][0].offy - 25, board[0][0].size, 25);
+        g2.setColor(Color.decode("#ffffff"));
+        g2.drawString(String.valueOf(colh), board[0][0].offx + 34 + (x * board[0][0].size), board[0][0].offy - 8);
       }
+
+      g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
+      if (board[y][x].id == clickStart) g2.setColor(Color.decode("#003366"));
+      g2.fill(board[y][x].shape);
+
       toggle = toggle == 0 ? 1 : 0;
-      rowh--;
+      colh++;
     }
+    toggle = toggle == 0 ? 1 : 0;
+    rowh--;
+  }
 
     // DRAW PIECES
     String fn;
@@ -102,11 +102,11 @@ class Game extends JPanel {
           fn = "./img/" + (board[y][x].piece.side == 0 ? "w" : "b") + "_" + board[y][x].piece.type.name().toLowerCase()
               + ".png";
           try {
-            icon = ImageIO.read(new File(fn));
+            ui = ImageIO.read(new File(fn));
           } catch (IOException e) {
             e.printStackTrace();
           }
-          g.drawImage(icon, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
+          g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
         }
       }
     }
@@ -164,7 +164,6 @@ class Game extends JPanel {
           || (board[y1][x1].piece.side == 1 && board[y1 + 1][x1].piece == null)) {
         slopes.add((float) 0);
         distances.add((float) 1);
-        System.out.println("can forward");
       }
       // CAN CAPTURE SIDEWAYS
       if ((board[y1][x1].piece.side == 0 && ((x1 - 1 > 0 && board[y1 - 1][x1 - 1].piece != null)
@@ -173,29 +172,25 @@ class Game extends JPanel {
               || (x1 + 1 < 8 && board[y1 + 1][x1 + 1].piece != null)))) {
         slopes.add((float) 1);
         distances.add((float) Math.sqrt(2));
-        System.out.println("can sideways");
       }
 
       if (piece.moved == 0)
         distances.add((float) 2);
 
       break;
-    case EMPTY:
     }
 
     // SLOPE
-    int p1 = y2 - y1;
-    int p2 = x2 - x1;
-    float slope = ((x2 - x1) == 0 || (y2 - y1) == 0) ? 0 : Math.abs((float) p1 / (float) p2);
-
+    float slope = ((x2 - x1) == 0 || (y2 - y1) == 0) ? 0 : Math.abs((float) (y2 - y1) / (float) (x2 - x1));
     // DISTANCE
     float dist = (float) Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 
     // PAWN IS THE ONLY PIECE THAT NEEDS A LITTLE HELP
-    boolean pawntest = (piece.type == ChessPiece.PAWN
-        && ((y2 - y1) == 0 || (piece.side == 0 && y2 > y1) || (piece.side == 1 && y2 < y1))) ? false : true;
-    if (piece.type == ChessPiece.PAWN && listContains(slopes, (float) 1)
-        && (board[y2][x2].piece == null || board[y2][x2].piece.side == piece.side))
+    boolean pawntest = (piece.type == ChessPiece.PAWN && 
+        ((y2 - y1) == 0 || (piece.side == 0 && y2 > y1) || (piece.side == 1 && y2 < y1))) ? false : true;
+    
+    if (piece.type == ChessPiece.PAWN && listContains(slopes, (float) 1) && 
+       (board[y2][x2].piece == null || board[y2][x2].piece.side == piece.side))
       pawntest = false;
 
     if (listContains(slopes, slope) && (listContains(distances, 0) || listContains(distances, dist)) && pawntest) {
@@ -221,14 +216,14 @@ class Game extends JPanel {
     board[y1][x1].piece = null;
 
     // Update Current State
-    currentState.update(board);
+    //currentState.setState(board);
     // currentState.print();
-    if (Main.client != null && Main.client.isActive()) {
-      Main.client.sendData(currentState.serialize());
-    }
-    if (Main.server != null && Main.server.isActive()) {
-      Main.server.sendData(currentState.serialize());
-    }
+    //if (Main.client != null && Main.client.isActive()) {
+    //  Main.client.sendData(currentState.serialize());
+    //}
+    //if (Main.server != null && Main.server.isActive()) {
+    //  Main.server.sendData(currentState.serialize());
+    //}
   }
 
   public void loadSquares() {
@@ -240,13 +235,51 @@ class Game extends JPanel {
     }
   }
 
-  public void loadPieces() {
-    for (int y = 0; y < 8; y++) {
-      for (int x = 0; x < 8; x++) {
-        String id = String.valueOf(x) + String.valueOf(y);
-        board[y][x].piece = currentState.state[y][x];
-      }
-    }
+  public void loadPieces()
+  {
+    ChessPiece type = ChessPiece.PAWN;
+    int       side   = 1;
+    
+    int w = 0;
+    for(int y=0;y<8;y++)
+    {      
+      if(y==4) side--;
+      
+      for(int x=0;x<8;x++)
+      {
+        
+        if( (y==0 || y==7) && (x==0 || x==7)) {
+          type = ChessPiece.ROOK;
+          w=1;
+        }
+        if( (y==0 || y==7) && (x==1 || x==6)) {
+          type = ChessPiece.KNIGHT;
+          w=1;
+        }
+        if( (y==0 || y==7) && (x==2 || x==5)) {
+          type = ChessPiece.BISCHOP;
+          w=1;
+        }
+        if( (y==0 || y==7) && (x==3)) {
+          type = ChessPiece.QUEEN;
+          w=1;
+        }
+        if( (y==0 || y==7) && (x==4)) {
+          type = ChessPiece.KING;
+          w=1;
+        }
+        if(y==1 || y==6) {
+          type = ChessPiece.PAWN;
+          w=1;
+        }        
+                
+        if(w==1) {
+          board[y][x].piece = new Piece(type,side);
+        }        
+        w=0;
+      }      
+    }   
+   
   }
 
   public void gameListener() {
@@ -259,11 +292,14 @@ class Game extends JPanel {
 
         int x1 = (clickStart != null) ? Integer.parseInt(clickStart.substring(0, 1)) : 0;
         int y1 = (clickStart != null) ? Integer.parseInt(clickStart.substring(1, 2)) : 0;
+        int x2 = (clickEnd != null)   ? Integer.parseInt(clickEnd.substring(0, 1)) : 0;
+        int y2 = (clickEnd != null)   ? Integer.parseInt(clickEnd.substring(1, 2)) : 0;
 
         if (clickStart != null) {
           x1 = Integer.parseInt(clickStart.substring(0, 1));
           y1 = Integer.parseInt(clickStart.substring(1, 2));
         }
+        
         // previously dealt with a final click, flush the trigger
         if (clickEnd != null) {
           clickStart = null;
@@ -279,18 +315,21 @@ class Game extends JPanel {
               // do nothing because validator below will catch it
             } else if (board[y][x].shape.contains(e.getPoint()) && clickStart == null && board[y][x].piece != null
                 && board[y][x].piece.side == turn) {
-              System.out.println("from " + board[y][x].id);
+              
               clickStart = board[y][x].id;
               valid = true;
               // if a start has already been selected set the destination
             } else if (board[y][x].shape.contains(e.getPoint()) && clickStart != null) {
-              System.out.println("to " + board[y][x].id);
+              
               clickEnd = board[y][x].id;
 
               if (validMove()) {
                 board[y1][x1].piece.moved = 1;
                 turn = (turn == 0) ? 1 : 0;
                 movePiece(clickStart, clickEnd);
+                
+                System.out.println("to " + board[y2][x2].id);
+                System.out.println("from " + board[y1][x1].id);
               }
 
               valid = false;
@@ -309,7 +348,6 @@ class Game extends JPanel {
 
         // DISPLAY CHANGES
         repaint();
-
       }
     });
   }
