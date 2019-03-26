@@ -16,7 +16,7 @@ class Game extends JPanel {
 
   BufferedImage ui, icon;
 
-  GameState currentState;
+  AI currentState;
 
   // MULTIARRAY
   Square[][] board = new Square[8][8];
@@ -27,7 +27,7 @@ class Game extends JPanel {
 
   // CONSTRUCTOR
   public Game() {
-    currentState = GameState.getInitState();
+    currentState = AI.getInitState();
     setLayout(null);
 
     loadSquares();
@@ -100,7 +100,7 @@ class Game extends JPanel {
         distances.add((float) 2);
 
       break;
-      default:
+    default:
       break;
     }
 
@@ -110,11 +110,11 @@ class Game extends JPanel {
     float dist = (float) Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 
     // PAWN IS THE ONLY PIECE THAT NEEDS A LITTLE HELP
-    boolean pawntest = (piece.type == ChessPiece.PAWN && 
-        ((y2 - y1) == 0 || (piece.side == 0 && y2 > y1) || (piece.side == 1 && y2 < y1))) ? false : true;
-    
-    if (piece.type == ChessPiece.PAWN && listContains(slopes, (float) 1) && 
-       (board[y2][x2].piece == null || board[y2][x2].piece.side == piece.side))
+    boolean pawntest = (piece.type == ChessPiece.PAWN
+        && ((y2 - y1) == 0 || (piece.side == 0 && y2 > y1) || (piece.side == 1 && y2 < y1))) ? false : true;
+
+    if (piece.type == ChessPiece.PAWN && listContains(slopes, (float) 1)
+        && (board[y2][x2].piece == null || board[y2][x2].piece.side == piece.side))
       pawntest = false;
 
     if (listContains(slopes, slope) && (listContains(distances, 0) || listContains(distances, dist)) && pawntest) {
@@ -153,7 +153,7 @@ class Game extends JPanel {
   public void loadSquares() {
     for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
-        //String id = String.valueOf(x) + String.valueOf(y);
+        // String id = String.valueOf(x) + String.valueOf(y);
         board[y][x] = currentState.state[y][x];
       }
     }

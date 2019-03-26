@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class GameState {
+public class AI {
     private static ChessPiece[] tOrder = { ChessPiece.ROOK, ChessPiece.KNIGHT, ChessPiece.BISCHOP, ChessPiece.QUEEN,
             ChessPiece.KING, ChessPiece.BISCHOP, ChessPiece.KNIGHT, ChessPiece.ROOK };
     private static ChessPiece[] bOrder = { ChessPiece.ROOK, ChessPiece.KNIGHT, ChessPiece.BISCHOP, ChessPiece.KING,
@@ -8,12 +8,12 @@ public class GameState {
 
     public Square[][] state;
 
-    public GameState() {
+    public AI() {
         state = new Square[8][8];
     }
 
-    public static GameState getInitState() {
-        GameState s = new GameState();
+    public static AI getInitState() {
+        AI s = new AI();
         for (int y = 0; y < s.state.length; y++) {
             for (int x = 0; x < s.state[y].length; x++) {
                 Piece p;
@@ -40,12 +40,12 @@ public class GameState {
     }
 
     public void setState(Square[][] squares) {
-        clear();
+        // clear();
         state = squares;
     }
 
     public void clear() {
-        for(Square[] sqrs : state){
+        for (Square[] sqrs : state) {
             Arrays.fill(sqrs, null);
         }
     }
@@ -95,8 +95,8 @@ public class GameState {
         return tmp;
     }
 
-    public static GameState deserialize(String str) {
-        GameState dState = new GameState();
+    public static AI deserialize(String str) {
+        AI dState = new AI();
         for (String s : str.split(",")) {
             String[] dat = s.split(":");
             Piece p = new Piece(ChessPiece.valueOf(dat[0]), ((dat[1].equals("WHITE")) ? 0 : 1));
@@ -112,7 +112,7 @@ public class GameState {
         return dState;
     }
 
-    public boolean equals(GameState s) {
+    public boolean equals(AI s) {
         return this.serialize().equals(s.serialize());
     }
 }
