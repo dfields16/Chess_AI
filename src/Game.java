@@ -16,7 +16,7 @@ class Game extends JPanel {
 
   BufferedImage ui, icon;
 
-  GameState currentState;
+  AI currentState;
 
   // MULTIARRAY
   Square[][] board = new Square[8][8];
@@ -27,7 +27,7 @@ class Game extends JPanel {
 
   // CONSTRUCTOR
   public Game() {
-    currentState = GameState.getInitState();
+    currentState = AI.getInitState();
     setLayout(null);
 
     loadSquares();
@@ -280,7 +280,7 @@ class Game extends JPanel {
           g2.drawString(String.valueOf(colh), board[0][0].offx + 34 + (x * board[0][0].size), board[0][0].offy - 8);
         }
 
-        g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
+        g2.setColor(toggle == 1 ? Color.decode("#1f1f1f") : Color.white);
         if (board[y][x].id == clickStart)
           g2.setColor(Color.decode("#003366"));
         g2.fill(board[y][x].shape);
