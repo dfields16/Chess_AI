@@ -73,9 +73,9 @@ public class AI {
             int x = (int)dat[2].charAt(1) - '0';
             int y = (int)dat[2].charAt(0) - 'A';
 
-            Square s = new Square(String.valueOf(x) + String.valueOf(y), x, y);
-            s.piece = p;
-            dState.state[y][x] = s;
+            Square sq = new Square(String.valueOf(x) + String.valueOf(y), x, y);
+            sq.piece = p;
+            dState.state[y][x] = sq;
         }
         return dState;
     }
