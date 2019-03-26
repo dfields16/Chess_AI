@@ -19,5 +19,11 @@ class Square {
     row = r;
     shape = new Rectangle.Double((offx + c * size), (offy + r * size), size, size);
   }
+  public Square(int c, int r) {
+    id = String.valueOf(c) + String.valueOf(r);
+    col = c;
+    row = r;
+    shape = new Rectangle.Double((offx + c * size), (offy + r * size), size, size);
+  }
 
 }

@@ -7,7 +7,6 @@ import java.util.TimerTask;
 import java.util.Timer;
 
 public class Main {
-  
   static TCPClient client = null;
   static TCPServer server = null;
 
@@ -39,25 +38,24 @@ public class Main {
         server.setupStreams();
 
       }
-      
       Timer timer = new Timer();
       TimerTask task = new TimerTask() {
         @Override
         public void run() {
           try {
             if (server != null && server.isActive()) {
-              AI state = AI.deserialize(server.recieveData());
+              GameState state = GameState.deserialize(server.recieveData());
               if(!state.equals(board.currentState)){
                 board.currentState = state;
-                board.loadPieces();  
+                board.loadSquares();
                 board.turn = (board.turn == 1) ? 0 : 1;
               }
             }
             if (client != null && client.isActive()) {
-              AI state = AI.deserialize(client.recieveData());
+              GameState state = GameState.deserialize(client.recieveData());
               if(!state.equals(board.currentState)){
                 board.currentState = state;
-                board.loadPieces();  
+                board.loadSquares();
                 board.turn = (board.turn == 1) ? 0 : 1;
               }
             }
@@ -66,7 +64,6 @@ public class Main {
           }
         }
       };
-      
       timer.scheduleAtFixedRate(task, 0, 100);
 
     }
