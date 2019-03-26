@@ -265,8 +265,8 @@ class Game extends JPanel {
             t = ChessPiece.PAWN;
           p = new Piece(t, 0);
         } else {
-          // p = new Piece(ChessPiece.EMPTY, -1);
-          p = null;
+          p = new Piece(ChessPiece.EMPTY, -1);
+          //p = null;
         }
         String id = String.valueOf(x) + String.valueOf(y);
         state[y][x] = new Square(id, x, y);
