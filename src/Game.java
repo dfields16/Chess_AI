@@ -178,6 +178,7 @@ class Game extends JPanel {
         distances.add((float) 2);
 
       break;
+      case EMPTY:
     }
 
     // SLOPE
