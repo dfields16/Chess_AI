@@ -18,14 +18,12 @@ class Move{
   Move(int x1, int y1,int x2, int y2){
     from.setLocation(x1,y1);
     to.setLocation(x2,y2);
-  }
-  
+  }  
   Move(Point f, Point t,Piece c){
     from = f;
     to   = t;
     captured = c;
-  }
-  
+  }  
 }
 
 class Game extends JPanel {
@@ -134,23 +132,10 @@ class Game extends JPanel {
     case EMPTY:
     break;
     }
-    
+
     // CHECK FOR COLLISION
-    if(piece.type != ChessPiece.KNIGHT){
-      int xp = x2;
-      int yp = y2;      
-      while(true)
-      {
-        // increment in direction of root
-        if(xp>x1){xp--;}else if(xp<x1){xp++;}
-        if(yp>y1){yp--;}else if(yp<y1){yp++;}
-        // if at root exit while
-        if(yp==y1 && xp==x1) break;
-        // if piece found exit validation
-        if(board[yp][xp].piece != null) return false;        
-      }
-    }
-    
+    if( checkCollision(clickStart,clickEnd)) return false;
+
     //EVALUATE FINAL RESPONSE
     if (listContains(slopes, Math.abs(slope)) && (listContains(distances, 0) || listContains(distances, dist)) && pawntest) {
       return true;
@@ -162,6 +147,24 @@ class Game extends JPanel {
     for (float elem : list)
       if (elem == key)
         return true;
+    return false;
+  }
+
+  public boolean checkCollision(Point a, Point b){
+    if(board[(int)a.getY()][(int)a.getX()].piece.type != ChessPiece.KNIGHT){
+      int xp = (int)b.getX();
+      int yp = (int)b.getY();
+      while(true)
+      {
+        // increment in direction of root
+        if(xp>(int)a.getX()){xp--;}else if(xp<(int)a.getX()){xp++;}
+        if(yp>(int)a.getY()){yp--;}else if(yp<(int)a.getY()){yp++;}
+        // if at root exit while
+        if(yp==(int)a.getY() && xp==(int)a.getX()) break;
+        // if piece found exit validation
+        if(board[yp][xp].piece != null) return true;        
+      }      
+    }
     return false;
   }
 
@@ -232,10 +235,9 @@ class Game extends JPanel {
         }        
         w=0;
       }      
-    }   
-
+    }
   }
-
+  
   public void checkCapture(){    
     if( board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece != null ){
       System.out.println("captured: " + board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece.type);
@@ -251,7 +253,7 @@ class Game extends JPanel {
 
       // BOARD/MOUSE INTERACTION
       public void mouseMoved(MouseEvent e){
-        cursor = e.getLocationOnScreen();
+        cursor = e.getPoint();
         if(clickStart != null) repaint();
       }
 
@@ -297,7 +299,6 @@ class Game extends JPanel {
 
               valid = false;
             }
-
           }
         }
 
@@ -311,7 +312,6 @@ class Game extends JPanel {
 
         // DISPLAY CHANGES
         repaint();
-
       }
     });
   }
@@ -394,7 +394,6 @@ class Game extends JPanel {
           }else{
             g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
           }          
-          
         }
       }
     }
@@ -440,9 +439,7 @@ class Game extends JPanel {
           }
           
         }
-        
-        
-        
+
       }
     }
 
