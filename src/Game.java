@@ -92,9 +92,9 @@ class Game extends JPanel {
     break;
     case PAWN:
       slopes.add((float) 0);
-      slopes.add( (float) 1);  
+      slopes.add((float) 1);  
       distances.add((float) 1);
-      distances.add( (float) Math.sqrt(2));
+      distances.add((float) Math.sqrt(2));
       if (piece.moved == 0) distances.add((float) 2);
 
       // prevent horizontal pawn movement
