@@ -50,19 +50,22 @@ class Game extends JPanel {
     int dy = (turn==0) ?  (y2-y1) : (y2-y1);
     int py = (turn==0) ? -(y2-y1) : (y2-y1);
 
-    if (board[y2][x2].piece != null && board[y2][x2].piece.side == board[y1][x1].piece.side)
-      return false;
+    
 
     Piece piece = board[y1][x1].piece;
 
     List<Float> slopes = new ArrayList<>();
     List<Float> distances = new ArrayList<>();
     
-    // CALCULATE THE SLOPE FOR THE DESIRED MOVE
+    // CALCULATE THE SLOPE/DISTANCE FOR THE DESIRED MOVE
     float slope = (dx==0 || dy==0) ? 0 : (float)dy / (float)dx;
     float dist  = (float) Math.sqrt(dx*dx + dy*dy);
     
     boolean pawntest = true;
+    
+    // IF TARGET IS ON SAME TEAM LEAVE EARLY
+    if (board[y2][x2].piece != null && board[y2][x2].piece.side == board[y1][x1].piece.side)
+      return false;
     
     // ASSIGN EACH OF THE PIECES A SLOPE AND DISTANCE THEY CAN MOVE
     switch (piece.type) {
@@ -92,21 +95,37 @@ class Game extends JPanel {
     break;
     case PAWN:
       slopes.add((float) 0);
-      slopes.add((float) 1);  
+      slopes.add( (float) 1);  
       distances.add((float) 1);
-      distances.add((float) Math.sqrt(2));
+      distances.add( (float) Math.sqrt(2));
       if (piece.moved == 0) distances.add((float) 2);
 
       // prevent horizontal pawn movement
       if(dy==0) pawntest = false;
       // prevent backward movement
-      if(py<0)  pawntest = false;
+      if(py<0) pawntest = false;
       // if trying to go forward prevent capture
       if(Math.abs(slope) == 0 && (board[y2][x2].piece != null) ) pawntest = false;
       // if trying to go diagonal make sure it is a capture
       if(Math.abs(slope) == 1 && (board[y2][x2].piece == null || turn == board[y2][x2].piece.side)) pawntest = false;
 
     break;
+    }
+    
+    // CHECK FOR COLLISION
+    if(piece.type != ChessPiece.KNIGHT){
+      int xp = x2;
+      int yp = y2;      
+      while(true)
+      {
+        // increment in direction of root
+        if(xp>x1){xp--;}else if(xp<x1){xp++;}
+        if(yp>y1){yp--;}else if(yp<y1){yp++;}
+        //if at root exit while
+        if(yp==y1 && xp==x1) break;
+        // if piece found exit validation
+        if(board[yp][xp].piece != null) return false;        
+      }
     }
     
     //EVALUATE FINAL RESPONSE
