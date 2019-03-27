@@ -41,10 +41,14 @@ class Game extends JPanel {
 
   public boolean validMove() {
 
-    int x1 = Integer.parseInt(clickStart.substring(0, 1));
-    int y1 = Integer.parseInt(clickStart.substring(1, 2));
-    int x2 = Integer.parseInt(clickEnd.substring(0, 1));
-    int y2 = Integer.parseInt(clickEnd.substring(1, 2));
+    int x1 = Integer.parseInt(clickStart.substring(0,1));
+    int y1 = Integer.parseInt(clickStart.substring(1,2));
+    int x2 =   Integer.parseInt(clickEnd.substring(0,1));
+    int y2 =   Integer.parseInt(clickEnd.substring(1,2));
+    
+    int dx = (turn==0) ?  (x2-x1) : (x2-x1);
+    int dy = (turn==0) ?  (y2-y1) : (y2-y1);
+    int py = (turn==0) ? -(y2-y1) : (y2-y1);
 
     if (board[y2][x2].piece != null && board[y2][x2].piece.side == board[y1][x1].piece.side)
       return false;
@@ -53,71 +57,60 @@ class Game extends JPanel {
 
     List<Float> slopes = new ArrayList<>();
     List<Float> distances = new ArrayList<>();
-
+    
+    // CALCULATE THE SLOPE FOR THE DESIRED MOVE
+    float slope = (dx==0 || dy==0) ? 0 : (float)dy / (float)dx;
+    float dist  = (float) Math.sqrt(dx*dx + dy*dy);
+    
+    boolean pawntest = true;
+    
+    // ASSIGN EACH OF THE PIECES A SLOPE AND DISTANCE THEY CAN MOVE
     switch (piece.type) {
     case KING:
       slopes.add((float) 0);
       slopes.add((float) 1);
       distances.add((float) 1);
       distances.add((float) Math.sqrt(2));
-      break;
+    break;
     case QUEEN:
       slopes.add((float) 0);
       slopes.add((float) 1);
       distances.add((float) 0);
-      break;
+    break;
     case BISCHOP:
       slopes.add((float) 1);
       distances.add((float) 0);
-      break;
+    break;
     case KNIGHT:
       slopes.add((float) 2);
       slopes.add((float) .5);
       distances.add((float) Math.sqrt(5));
-      break;
+    break;
     case ROOK:
       slopes.add((float) 0);
       distances.add((float) 0);
-      break;
+    break;
     case PAWN:
+      slopes.add((float) 0);
+      slopes.add( (float) 1);  
+      distances.add((float) 1);
+      distances.add( (float) Math.sqrt(2));
+      if (piece.moved == 0) distances.add((float) 2);
 
-      // CANNOT CAPTURE FORWARD
-      if ((board[y1][x1].piece.side == 0 && board[y1 - 1][x1].piece == null)
-          || (board[y1][x1].piece.side == 1 && board[y1 + 1][x1].piece == null)) {
-        slopes.add((float) 0);
-        distances.add((float) 1);
-      }
-      // CAN CAPTURE SIDEWAYS
-      if ((board[y1][x1].piece.side == 0 && ((x1 - 1 > 0 && board[y1 - 1][x1 - 1].piece != null)
-          || (x1 + 1 < 8 && board[y1 - 1][x1 + 1].piece != null)))
-          || (board[y1][x1].piece.side == 1 && ((x1 - 1 > 0 && board[y1 + 1][x1 - 1].piece != null)
-              || (x1 + 1 < 8 && board[y1 + 1][x1 + 1].piece != null)))) {
-        slopes.add((float) 1);
-        distances.add((float) Math.sqrt(2));
-      }
+      // prevent horizontal pawn movement
+      if(dy==0) pawntest = false;
+      // prevent backward movement
+      if(py<0)  pawntest = false;
+      // if trying to go forward prevent capture
+      if(Math.abs(slope) == 0 && (board[y2][x2].piece != null) ) pawntest = false;
+      // if trying to go diagonal make sure it is a capture
+      if(Math.abs(slope) == 1 && (board[y2][x2].piece == null || turn == board[y2][x2].piece.side)) pawntest = false;
 
-      if (piece.moved == 0)
-        distances.add((float) 2);
-
-      break;
-    default:
-      break;
+    break;
     }
-
-    // SLOPE
-    float slope = ((x2 - x1) == 0 || (y2 - y1) == 0) ? 0 : Math.abs((float) (y2 - y1) / (float) (x2 - x1));
-    // DISTANCE
-    float dist = (float) Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-
-    // PAWN IS THE ONLY PIECE THAT NEEDS A LITTLE HELP
-    boolean pawntest = (piece.type == ChessPiece.PAWN
-        && ((y2 - y1) == 0 || (piece.side == 0 && y2 > y1) || (piece.side == 1 && y2 < y1))) ? false : true;
-
-    if (piece.type == ChessPiece.PAWN && listContains(slopes, (float) 1)
-        && (board[y2][x2].piece == null || board[y2][x2].piece.side == piece.side))
-      pawntest = false;
-
-    if (listContains(slopes, slope) && (listContains(distances, 0) || listContains(distances, dist)) && pawntest) {
+    
+    //EVALUATE FINAL RESPONSE
+    if (listContains(slopes, Math.abs(slope)) && (listContains(distances, 0) || listContains(distances, dist)) && pawntest) {
       return true;
     }
     return false;
