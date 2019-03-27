@@ -17,7 +17,6 @@ public class Main {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(1020, 765);
     frame.setResizable(false);
-    frame.setBackground(Color.decode("#003300"));
 
     frame.add(board);
 
