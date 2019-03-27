@@ -1,6 +1,4 @@
-enum ChessPiece {
-  EMPTY, KING, QUEEN, BISCHOP, KNIGHT, ROOK, PAWN
-}
+enum ChessPiece {EMPTY, KING, QUEEN, BISCHOP, KNIGHT, ROOK, PAWN}
 
 class Piece {
 

@@ -45,16 +45,16 @@ public class Main {
           try {
             if (server != null && server.isActive()) {
               AI state = AI.deserialize(server.recieveData());
-              if (!state.equals(board.currentState)) {
-                board.currentState = state;
+              if (!state.equals(board.ai)) {
+                board.ai = state;
                 board.loadSquares();
                 board.turn = (board.turn == 1) ? 0 : 1;
               }
             }
             if (client != null && client.isActive()) {
               AI state = AI.deserialize(client.recieveData());
-              if (!state.equals(board.currentState)) {
-                board.currentState = state;
+              if (!state.equals(board.ai)) {
+                board.ai = state;
                 board.loadSquares();
                 board.turn = (board.turn == 1) ? 0 : 1;
               }

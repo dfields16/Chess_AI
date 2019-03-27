@@ -1,47 +1,16 @@
 import java.util.Arrays;
 
 public class AI {
-    private static ChessPiece[] tOrder = { ChessPiece.ROOK, ChessPiece.KNIGHT, ChessPiece.BISCHOP, ChessPiece.QUEEN,
-            ChessPiece.KING, ChessPiece.BISCHOP, ChessPiece.KNIGHT, ChessPiece.ROOK };
-    private static ChessPiece[] bOrder = { ChessPiece.ROOK, ChessPiece.KNIGHT, ChessPiece.BISCHOP, ChessPiece.KING,
-            ChessPiece.QUEEN, ChessPiece.BISCHOP, ChessPiece.KNIGHT, ChessPiece.ROOK };
 
     public Square[][] state;
 
     public AI() {
-        state = new Square[8][8];
-    }
 
-    public static AI getInitState() {
-        AI s = new AI();
-        for (int y = 0; y < s.state.length; y++) {
-            for (int x = 0; x < s.state[y].length; x++) {
-                Piece p;
-                if (y < 2) {
-                    ChessPiece t = tOrder[x];
-                    if (y == 1)
-                        t = ChessPiece.PAWN;
-                    p = new Piece(t, 1);
-                } else if (y > 5) {
-                    ChessPiece t = bOrder[x];
-                    if (y == 6)
-                        t = ChessPiece.PAWN;
-                    p = new Piece(t, 0);
-                } else {
-                    // p = new Piece(ChessPiece.EMPTY, -1);
-                    p = null;
-                }
-                Square sqr = new Square(x, y);
-                sqr.piece = p;
-                s.state[y][x] = sqr;
-            }
-        }
-        return s;
     }
 
     public void setState(Square[][] squares) {
         // clear();
-        state = squares;
+        //state = squares;
     }
 
     public void clear() {
@@ -59,13 +28,13 @@ public class AI {
                 if (state[x][y].piece.type == ChessPiece.EMPTY) {
                     line += "\t|";
                 } else {
-                    line += state[x][y].piece.type.toString().substring(0, 4) + "\t│";
+                    line += state[x][y].piece.type.toString().substring(0, 4) + "\t|";
                 }
                 if (y != state[x].length - 1)
                     border += "|=======";
             }
             border += "|";
-            System.out.println(line.substring(0, line.length() - 1) + "║");
+            System.out.println(line.substring(0, line.length() - 1) + "|");
             if (x != state.length - 1)
                 System.out.println(border);
             else

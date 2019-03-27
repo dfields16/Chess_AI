@@ -16,7 +16,7 @@ class Game extends JPanel {
 
   BufferedImage ui;
 
-  AI currentState;
+  AI ai;
 
   // MULTIARRAY
   Square[][] board = new Square[8][8];
@@ -27,7 +27,6 @@ class Game extends JPanel {
 
   // CONSTRUCTOR
   public Game() {
-    currentState = AI.getInitState();
     setLayout(null);
 
     loadSquares();
@@ -107,6 +106,8 @@ class Game extends JPanel {
       // if trying to go diagonal make sure it is a capture
       if(Math.abs(slope) == 1 && (board[y2][x2].piece == null || turn == board[y2][x2].piece.side)) pawntest = false;
     break;
+    case EMPTY:
+    break;
     }
     
     // CHECK FOR COLLISION
@@ -149,32 +150,70 @@ class Game extends JPanel {
     board[y1][x1].piece = null;
 
     // Update Current State
-    currentState.setState(board);
-    // currentState.print();
+    //ai.setState(board);
+    //currentState.print();
     if (Main.client != null && Main.client.isActive()) {
-      Main.client.sendData(currentState.serialize());
+      Main.client.sendData(ai.serialize());
     }
     if (Main.server != null && Main.server.isActive()) {
-      Main.server.sendData(currentState.serialize());
+      Main.server.sendData(ai.serialize());
     }
   }
 
   public void loadSquares() {
     for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
-        // String id = String.valueOf(x) + String.valueOf(y);
-        board[y][x] = currentState.state[y][x];
+        String id = String.valueOf(x) + String.valueOf(y);
+        board[y][x] = new Square(id, x, y);
       }
     }
   }
 
-  public void loadPieces() {
-    for (int y = 0; y < 8; y++) {
-      for (int x = 0; x < 8; x++) {
-        // String id = String.valueOf(x) + String.valueOf(y);
-        board[y][x].piece = currentState.state[y][x].piece;
-      }
-    }
+  public void loadPieces()
+  {
+    ChessPiece type = ChessPiece.PAWN;
+    int       side   = 1;
+
+    int w = 0;
+    for(int y=0;y<8;y++)
+    {      
+      if(y==4) side--;
+      
+      for(int x=0;x<8;x++)
+      {
+
+        if( (y==0 || y==7) && (x==0 || x==7)) {
+          type = ChessPiece.ROOK;
+          w=1;
+        }
+        if( (y==0 || y==7) && (x==1 || x==6)) {
+          type = ChessPiece.KNIGHT;
+          w=1;
+        }
+        if( (y==0 || y==7) && (x==2 || x==5)) {
+          type = ChessPiece.BISCHOP;
+          w=1;
+        }
+        if( (y==0 || y==7) && (x==3)) {
+          type = ChessPiece.QUEEN;
+          w=1;
+        }
+        if( (y==0 || y==7) && (x==4)) {
+          type = ChessPiece.KING;
+          w=1;
+        }
+        if(y==1 || y==6) {
+          type = ChessPiece.PAWN;
+          w=1;
+        }        
+
+        if(w==1) {
+          board[y][x].piece = new Piece(type,side);
+        }        
+        w=0;
+      }      
+    }   
+
   }
 
   public void gameListener() {
