@@ -4,8 +4,8 @@ import java.awt.Shape;
 class Square {
 
   int size = 75;
-  int offx = 100;
-  int offy = 100;
+  int offx = 215;
+  int offy = 75;
 
   String id;
   int col, row;
