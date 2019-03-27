@@ -220,16 +220,16 @@ class Game extends JPanel {
 
   public void gameListener() {
     
-    addMouseMotionListener(new MouseAdapter() {    
+    addMouseMotionListener(new MouseAdapter() {
 
       // BOARD/MOUSE INTERACTION
       public void mouseMoved(MouseEvent e){
         cursor = e.getLocationOnScreen();
         if(clickStart != null) repaint();
       }
-      
+
     });
-    
+
     addMouseListener(new MouseAdapter() {    
 
       // BOARD/MOUSE INTERACTION
