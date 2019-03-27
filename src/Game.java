@@ -50,8 +50,6 @@ class Game extends JPanel {
     int dy = (turn==0) ?  (y2-y1) : (y2-y1);
     int py = (turn==0) ? -(y2-y1) : (y2-y1);
 
-    
-
     Piece piece = board[y1][x1].piece;
 
     List<Float> slopes = new ArrayList<>();
@@ -108,7 +106,6 @@ class Game extends JPanel {
       if(Math.abs(slope) == 0 && (board[y2][x2].piece != null) ) pawntest = false;
       // if trying to go diagonal make sure it is a capture
       if(Math.abs(slope) == 1 && (board[y2][x2].piece == null || turn == board[y2][x2].piece.side)) pawntest = false;
-
     break;
     }
     
