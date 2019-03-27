@@ -121,7 +121,7 @@ class Game extends JPanel {
         // increment in direction of root
         if(xp>x1){xp--;}else if(xp<x1){xp++;}
         if(yp>y1){yp--;}else if(yp<y1){yp++;}
-        //if at root exit while
+        // if at root exit while
         if(yp==y1 && xp==x1) break;
         // if piece found exit validation
         if(board[yp][xp].piece != null) return false;        
