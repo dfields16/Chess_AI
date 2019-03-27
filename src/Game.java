@@ -14,7 +14,7 @@ class Game extends JPanel {
 
   // MEMBER VARIABLES
 
-  BufferedImage ui, icon;
+  BufferedImage ui;
 
   AI currentState;
 
@@ -293,11 +293,11 @@ class Game extends JPanel {
           fn = "./img/" + (board[y][x].piece.side == 0 ? "w" : "b") + "_" + board[y][x].piece.type.name().toLowerCase()
               + ".png";
           try {
-            icon = ImageIO.read(new File(fn));
+            ui = ImageIO.read(new File(fn));
           } catch (IOException e) {
             e.printStackTrace();
           }
-          g.drawImage(icon, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
+          g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
         }
       }
     }
