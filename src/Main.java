@@ -15,7 +15,7 @@ public class Main {
 
     JFrame frame = new JFrame("Chess Master");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(1000, 765);
+    frame.setSize(1020, 765);
     frame.setResizable(false);
     frame.setBackground(Color.decode("#003300"));
 

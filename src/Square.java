@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
@@ -7,22 +8,13 @@ class Square {
   int offx = 215;
   int offy = 75;
 
-  String id;
-  int col, row;
-
-  Piece piece = null;
+  Point coord = new Point();
   Shape shape;
-
-  public Square(String i, int c, int r) {
-    id = i;
-    col = c;
-    row = r;
-    shape = new Rectangle.Double((offx + c * size), (offy + r * size), size, size);
-  }
+  
+  Piece piece = null;
+  
   public Square(int c, int r) {
-    id = String.valueOf(c) + String.valueOf(r);
-    col = c;
-    row = r;
+    coord.setLocation(c,r);
     shape = new Rectangle.Double((offx + c * size), (offy + r * size), size, size);
   }
 

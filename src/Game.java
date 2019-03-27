@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.JPanel;
 
 import java.awt.image.BufferedImage;
@@ -8,6 +9,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
+
+class Move{
+  
+  Point from,to;
+  Piece captured = null;
+  
+  Move(int x1, int y1,int x2, int y2){
+    from.setLocation(x1,y1);
+    to.setLocation(x2,y2);
+  }
+  
+  Move(Point f, Point t,Piece c){
+    from = f;
+    to   = t;
+    captured = c;
+  }
+  
+}
 
 class Game extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -20,15 +39,19 @@ class Game extends JPanel {
 
   // MULTIARRAY
   Square[][] board = new Square[8][8];
-
-  String clickStart = null;
-  String clickEnd = null;
-  int turn = 0;
   
+  ArrayList<Move> history = new ArrayList<Move>();
+  
+  Point clickStart = null;
+  Point clickEnd   = null;
+  
+  int turn = 0;
+
   Point cursor;
 
   // CONSTRUCTOR
   public Game() {
+    
     setLayout(null);
 
     loadSquares();
@@ -42,10 +65,10 @@ class Game extends JPanel {
 
   public boolean validMove() {
 
-    int x1 = Integer.parseInt(clickStart.substring(0,1));
-    int y1 = Integer.parseInt(clickStart.substring(1,2));
-    int x2 =   Integer.parseInt(clickEnd.substring(0,1));
-    int y2 =   Integer.parseInt(clickEnd.substring(1,2));
+    int x1 = (int)clickStart.getX();
+    int y1 = (int)clickStart.getY();
+    int x2 = (int)clickEnd.getX();
+    int y2 = (int)clickEnd.getY();
     
     int dx = (turn==0) ?  (x2-x1) : (x2-x1);
     int dy = (turn==0) ?  (y2-y1) : (y2-y1);
@@ -142,14 +165,10 @@ class Game extends JPanel {
     return false;
   }
 
-  public void movePiece(String start, String end) {
-    int x1 = Integer.parseInt(start.substring(0, 1));
-    int y1 = Integer.parseInt(start.substring(1, 2));
-    int x2 = Integer.parseInt(end.substring(0, 1));
-    int y2 = Integer.parseInt(end.substring(1, 2));
+  public void movePiece() {
 
-    board[y2][x2].piece = board[y1][x1].piece;
-    board[y1][x1].piece = null;
+    board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece = board[(int)clickStart.getY()][(int)clickStart.getX()].piece;
+    board[(int)clickStart.getY()][(int)clickStart.getX()].piece = null;
 
     // Update Current State
     //ai.setState(board);
@@ -165,8 +184,7 @@ class Game extends JPanel {
   public void loadSquares() {
     for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
-        String id = String.valueOf(x) + String.valueOf(y);
-        board[y][x] = new Square(id, x, y);
+        board[y][x] = new Square(x,y);
       }
     }
   }
@@ -218,6 +236,15 @@ class Game extends JPanel {
 
   }
 
+  public void checkCapture(){    
+    if( board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece != null ){
+      System.out.println("captured: " + board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece.type);
+      history.add( new Move(clickStart,clickEnd,board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece) );
+    }else{
+      history.add( new Move(clickStart,clickEnd,null) );
+    }
+  }
+
   public void gameListener() {
     
     addMouseMotionListener(new MouseAdapter() {
@@ -237,14 +264,7 @@ class Game extends JPanel {
       public void mousePressed(MouseEvent e) {
 
         boolean valid = false;
-
-        int x1 = (clickStart != null) ? Integer.parseInt(clickStart.substring(0, 1)) : 0;
-        int y1 = (clickStart != null) ? Integer.parseInt(clickStart.substring(1, 2)) : 0;
-
-        if (clickStart != null) {
-          x1 = Integer.parseInt(clickStart.substring(0, 1));
-          y1 = Integer.parseInt(clickStart.substring(1, 2));
-        }
+        
         // previously dealt with a final click, flush the trigger
         if (clickEnd != null) {
           clickStart = null;
@@ -256,22 +276,23 @@ class Game extends JPanel {
           for (int x = 0; x < 8; x++) {
             // if an initial square is selected set to start or start over if already
             // selected
-            if (board[y][x].shape.contains(e.getPoint()) && clickStart == board[y][x].id) {
+            if (board[y][x].shape.contains(e.getPoint()) && clickStart == board[y][x].coord) {
               // do nothing because validator below will catch it
             } else if (board[y][x].shape.contains(e.getPoint()) && clickStart == null && board[y][x].piece != null
                 && board[y][x].piece.side == turn) {
-              System.out.println("from " + board[y][x].id);
-              clickStart = board[y][x].id;
+              System.out.println("from " + board[y][x].coord);
+              clickStart = new Point(x,y);
               valid = true;
               // if a start has already been selected set the destination
             } else if (board[y][x].shape.contains(e.getPoint()) && clickStart != null) {
-              System.out.println("to " + board[y][x].id);
-              clickEnd = board[y][x].id;
-
+              System.out.println("to " + board[y][x].coord);
+              clickEnd = new Point(x,y);
+              
               if (validMove()) {
-                board[y1][x1].piece.moved = 1;
+                board[(int)clickStart.getY()][(int)clickStart.getX()].piece.moved = 1;
                 turn = (turn == 0) ? 1 : 0;
-                movePiece(clickStart, clickEnd);
+                checkCapture();
+                movePiece();
               }
 
               valid = false;
@@ -343,7 +364,7 @@ class Game extends JPanel {
         }
 
         g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
-        if (board[y][x].id == clickStart)
+        if( board[y][x].coord.equals(clickStart) )
           g2.setColor(Color.decode("#003366"));
         g2.fill(board[y][x].shape);
 
@@ -359,20 +380,69 @@ class Game extends JPanel {
     for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
         if (board[y][x].piece != null) {
+          
           fn = "./img/" + (board[y][x].piece.side == 0 ? "w" : "b") + "_" + board[y][x].piece.type.name().toLowerCase() + ".png";
+          
           try {
             ui = ImageIO.read(new File(fn));
           } catch (IOException e) {
             e.printStackTrace();
           }
            
-          if(clickStart != null && board[y][x].id == clickStart){
+          if( board[y][x].coord.equals(clickStart) ){
             g.drawImage(ui, (int)cursor.getX()-board[0][0].size/2, (int)cursor.getY()-(board[0][0].size/2)-25, null);
           }else{
             g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
           }          
           
         }
+      }
+    }
+
+    int jxw = board[0][0].offx-board[0][0].size*2;
+    int jyw = board[0][0].offy;
+    
+    int jxb = board[0][0].offx+(board[0][0].size*9-19);
+    int jyb = board[0][0].offy;
+    
+    int cntw=0,cntb=0;
+    
+    for(Move move : history){
+      
+      if(move.captured != null){
+        
+        fn = "./img/" + (move.captured.side == 0 ? "w" : "b") + "_" + move.captured.type.name().toLowerCase() + ".png";
+        
+        try {
+          ui = ImageIO.read(new File(fn));
+        }catch(IOException e){
+          e.printStackTrace();
+        }
+        
+        if(move.captured.side==0){
+          g.drawImage(ui,jxw,jyw, null);
+          jyw+=board[0][0].size;
+          cntw++;
+          
+          if(cntw==8){
+            jxw = board[0][0].offx-(board[0][0].size*2)-50;
+            jyw = board[0][0].offy;            
+          }
+          
+        }else{
+          g.drawImage(ui,jxb,jyb, null);
+          jyb+=board[0][0].size; 
+          cntb++;
+          
+          if(cntb==8){
+            jxb = board[0][0].offx+(board[0][0].size*9-19)+50;
+            jyb = board[0][0].offy;
+          }
+          
+        }
+        
+        
+        
       }
     }
 
