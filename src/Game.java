@@ -24,6 +24,8 @@ class Game extends JPanel {
   String clickStart = null;
   String clickEnd = null;
   int turn = 0;
+  
+  Point cursor;
 
   // CONSTRUCTOR
   public Game() {
@@ -217,9 +219,21 @@ class Game extends JPanel {
   }
 
   public void gameListener() {
+    
+    addMouseMotionListener(new MouseAdapter() {    
 
-    // BOARD/MOUSE INTERACTION
-    addMouseListener(new MouseAdapter() {
+      // BOARD/MOUSE INTERACTION
+      public void mouseMoved(MouseEvent e){
+        cursor = e.getLocationOnScreen();
+        if(clickStart != null) repaint();
+      }
+      
+    });
+    
+    addMouseListener(new MouseAdapter() {    
+
+      // BOARD/MOUSE INTERACTION
+
       public void mousePressed(MouseEvent e) {
 
         boolean valid = false;
@@ -345,14 +359,19 @@ class Game extends JPanel {
     for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
         if (board[y][x].piece != null) {
-          fn = "./img/" + (board[y][x].piece.side == 0 ? "w" : "b") + "_" + board[y][x].piece.type.name().toLowerCase()
-              + ".png";
+          fn = "./img/" + (board[y][x].piece.side == 0 ? "w" : "b") + "_" + board[y][x].piece.type.name().toLowerCase() + ".png";
           try {
             ui = ImageIO.read(new File(fn));
           } catch (IOException e) {
             e.printStackTrace();
           }
-          g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
+           
+          if(clickStart != null && board[y][x].id == clickStart){
+            g.drawImage(ui, (int)cursor.getX()-board[0][0].size/2, (int)cursor.getY()-(board[0][0].size/2)-25, null);
+          }else{
+            g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
+          }          
+          
         }
       }
     }
