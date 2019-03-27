@@ -262,7 +262,6 @@ class Game extends JPanel {
     addMouseListener(new MouseAdapter() {    
 
       // BOARD/MOUSE INTERACTION
-
       public void mousePressed(MouseEvent e) {
 
         boolean valid = false;
