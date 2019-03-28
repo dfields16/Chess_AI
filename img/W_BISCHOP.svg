@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 75 75" style="enable-background:new 0 0 75 75;" xml:space="preserve">
+<svg version="1.1" id="White" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 75 75" style="enable-background:new 0 0 75 75;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#CCCCCC;}
+	.st0{display:none;fill:#CCCCCC;}
 	.st1{fill:#FFFFFF;}
+	.st2{fill:#CCCCCC;}
 </style>
-<g id="bischop">
-	<polygon class="st0" points="40.3,17.9 44.8,23.4 41.8,25.9 37.9,21.4 	"/>
-	<polygon class="st1" points="49.8,62.1 43.8,37.8 43.8,36.3 51.2,26.4 46.8,20.9 41.8,25.9 37.9,21.4 43.3,15.4 38.3,9 37.9,9 
-		24.5,26.4 31.9,36.3 31.9,37.8 25.9,62.1 19,62.1 19,72 57.2,72 57.2,62.1 	"/>
-	<polygon class="st0" points="35.4,62.1 36.9,42.2 43.8,37.8 43.8,36.3 35.9,26.4 24.5,26.4 31.9,36.3 31.9,37.8 25.9,62.1 19,62.1 
-		19,72 30.9,72 30.9,62.1 	"/>
+<g id="w_bischop">
+	<polygon class="st0" points="40.3,16.9 44.8,22.4 41.8,24.9 37.9,20.4 	"/>
+	<g>
+		<polygon class="st1" points="18.8,71.3 18.8,60.8 25.7,60.8 31.7,36.7 31.6,35.4 24.1,25.4 37.7,7.8 38.5,7.8 43.6,14.5 
+			38.2,20.4 41.8,24.5 46.8,19.5 51.6,25.4 44.1,35.4 44.1,36.8 50,60.8 57.4,60.8 57.4,71.3 		"/>
+		<path d="M38.3,8l5,6.4l-5.5,6l4,4.5l5-5l4.5,5.5l-7.4,9.9v1.5l6,24.3h7.4V71H19v-9.9h6.9l6-24.3v-1.5l-7.4-9.9L37.9,8H38.3
+			 M38.6,7.5h-0.2h-0.5h-0.2l-0.2,0.2L24.1,25.1l-0.2,0.3l0.2,0.3l7.3,9.8v1.3l-5.8,23.9H19h-0.5v0.5V71v0.5H19h38.2h0.5V71v-9.9
+			v-0.5h-0.5h-7l-5.8-23.9v-1.3l7.3-9.8l0.2-0.3L51.6,25l-4.5-5.5l-0.3-0.4l-0.4,0.4l-4.6,4.6l-3.3-3.7l5.2-5.6l0.3-0.3l-0.3-0.3
+			l-5-6.4L38.6,7.5L38.6,7.5z"/>
+	</g>
+	<polygon class="st2" points="35.4,61.1 36.9,41.2 43.8,36.8 43.8,35.3 35.9,25.4 24.5,25.4 31.9,35.3 31.9,36.8 25.9,61.1 19,61.1 
+		19,71 30.9,71 30.9,61.1 	"/>
 </g>
 </svg>

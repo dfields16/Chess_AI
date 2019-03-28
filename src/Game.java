@@ -10,51 +10,37 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
-class Move{
-  
-  Point from,to;
-  Piece captured = null;
-  
-  Move(int x1, int y1,int x2, int y2){
-    from.setLocation(x1,y1);
-    to.setLocation(x2,y2);
-  }  
-  Move(Point f, Point t,Piece c){
-    from = f;
-    to   = t;
-    captured = c;
-  }  
-}
-
 class Game extends JPanel {
   private static final long serialVersionUID = 1L;
 
   // MEMBER VARIABLES
 
   BufferedImage ui;
-
   AI ai;
 
   // MULTIARRAY
-  Square[][] board = new Square[8][8];
+  Square[][] board = new Square[8][8];  
+  ArrayList<Move> history;
   
-  ArrayList<Move> history = new ArrayList<Move>();
-  
-  Point clickStart = null;
-  Point clickEnd   = null;
+  Move  click      = new Move();
   
   int turn = 0;
 
   Point cursor;
 
   // CONSTRUCTOR
-  public Game() {
-    
+  public Game() {    
     setLayout(null);
-
-    loadSquares();
-    loadPieces();
+    
+    history = new ArrayList<Move>();
+    
+    startGame();
     gameListener();
+  }
+  
+  public void startGame(){
+    loadSquares();
+    loadPieces();    
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -63,10 +49,10 @@ class Game extends JPanel {
 
   public boolean validMove() {
 
-    int x1 = (int)clickStart.getX();
-    int y1 = (int)clickStart.getY();
-    int x2 = (int)clickEnd.getX();
-    int y2 = (int)clickEnd.getY();
+    int x1 = click.x1();
+    int y1 = click.y1();
+    int x2 = click.x2();
+    int y2 = click.y2();
     
     int dx = (turn==0) ?  (x2-x1) : (x2-x1);
     int dy = (turn==0) ?  (y2-y1) : (y2-y1);
@@ -74,7 +60,7 @@ class Game extends JPanel {
 
     Piece piece = board[y1][x1].piece;
 
-    List<Float> slopes = new ArrayList<>();
+    List<Float> slopes    = new ArrayList<>();
     List<Float> distances = new ArrayList<>();
     
     // CALCULATE THE SLOPE/DISTANCE FOR THE DESIRED MOVE
@@ -134,7 +120,7 @@ class Game extends JPanel {
     }
 
     // CHECK FOR COLLISION
-    if( checkCollision(clickStart,clickEnd)) return false;
+    if( checkCollision(click.start,click.end)) return false;
 
     //EVALUATE FINAL RESPONSE
     if (listContains(slopes, Math.abs(slope)) && (listContains(distances, 0) || listContains(distances, dist)) && pawntest) {
@@ -169,9 +155,11 @@ class Game extends JPanel {
   }
 
   public void movePiece() {
+    
+    checkCapture();
 
-    board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece = board[(int)clickStart.getY()][(int)clickStart.getX()].piece;
-    board[(int)clickStart.getY()][(int)clickStart.getX()].piece = null;
+    board[click.y2()][click.x2()].piece = board[click.y1()][click.x1()].piece;
+    board[click.y1()][click.x1()].piece = null;
 
     // Update Current State
     //ai.setState(board);
@@ -236,14 +224,14 @@ class Game extends JPanel {
         w=0;
       }      
     }
+
   }
-  
+
   public void checkCapture(){    
-    if( board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece != null ){
-      System.out.println("captured: " + board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece.type);
-      history.add( new Move(clickStart,clickEnd,board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece) );
+    if( board[click.y2()][click.x2()].piece != null ){
+      history.add( new Move(click.start,click.end,board[click.y2()][click.x2()].piece) );      
     }else{
-      history.add( new Move(clickStart,clickEnd,null) );
+      history.add( new Move(click.start,click.end,null) );
     }
   }
 
@@ -254,7 +242,7 @@ class Game extends JPanel {
       // BOARD/MOUSE INTERACTION
       public void mouseMoved(MouseEvent e){
         cursor = e.getPoint();
-        if(clickStart != null) repaint();
+        if(click.start != null) repaint();
       }
 
     });
@@ -267,44 +255,41 @@ class Game extends JPanel {
         boolean valid = false;
         
         // previously dealt with a final click, flush the trigger
-        if (clickEnd != null) {
-          clickStart = null;
-          clickEnd = null;
+        if (click.end != null) {
+          click.clear();
         }
 
         // SEE IF A SQUARE WAS CLICKED
         for (int y = 0; y < 8; y++) {
           for (int x = 0; x < 8; x++) {
-            // if an initial square is selected set to start or start over if already
-            // selected
-            if (board[y][x].shape.contains(e.getPoint()) && clickStart == board[y][x].coord) {
+            // if an initial square is selected set to start or start over if already selected
+            if (board[y][x].shape.contains(e.getPoint()) && click.start == board[y][x].coord) {
               // do nothing because validator below will catch it
-            } else if (board[y][x].shape.contains(e.getPoint()) && clickStart == null && board[y][x].piece != null
+            } else if (board[y][x].shape.contains(e.getPoint()) && click.start == null && board[y][x].piece != null
                 && board[y][x].piece.side == turn) {
               System.out.println("from " + board[y][x].coord);
-              clickStart = new Point(x,y);
+              click.start = new Point(x,y);
               valid = true;
               // if a start has already been selected set the destination
-            } else if (board[y][x].shape.contains(e.getPoint()) && clickStart != null) {
+            } else if (board[y][x].shape.contains(e.getPoint()) && click.start != null) {
               System.out.println("to " + board[y][x].coord);
-              clickEnd = new Point(x,y);
+              click.end = new Point(x,y);
               
               if (validMove()) {
-                board[(int)clickStart.getY()][(int)clickStart.getX()].piece.moved = 1;
+                board[click.y1()][click.x1()].piece.moved = 1;
                 turn = (turn == 0) ? 1 : 0;
-                checkCapture();
                 movePiece();
               }
 
               valid = false;
             }
+
           }
         }
 
         // if something other than square was clicked
         if (!valid) {
-          clickStart = null;
-          clickEnd = null;
+          click.clear();
         } else {
           valid = false;
         }
@@ -363,7 +348,7 @@ class Game extends JPanel {
         }
 
         g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
-        if( board[y][x].coord.equals(clickStart) )
+        if( board[y][x].coord.equals(click.start) )
           g2.setColor(Color.decode("#003366"));
         g2.fill(board[y][x].shape);
 
@@ -388,11 +373,12 @@ class Game extends JPanel {
             e.printStackTrace();
           }
            
-          if( board[y][x].coord.equals(clickStart) ){
-            g.drawImage(ui, (int)cursor.getX()-board[0][0].size/2, (int)cursor.getY()-(board[0][0].size/2)-25, null);
+          if( board[y][x].coord.equals(click.start) ){
+            g.drawImage(ui, (int)cursor.getX()-board[0][0].size/2, (int)cursor.getY()-(board[0][0].size/2), null);
           }else{
             g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
           }          
+          
         }
       }
     }
@@ -438,7 +424,7 @@ class Game extends JPanel {
           }
           
         }
-
+        
       }
     }
 
