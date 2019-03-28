@@ -1,6 +1,4 @@
 import javax.swing.*;
-
-import java.awt.Color;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.TimerTask;
