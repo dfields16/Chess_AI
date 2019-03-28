@@ -349,11 +349,12 @@ class Game extends JPanel {
     g2.fillRect(board[0][0].offx - 25, board[0][0].offy - 25, 25, 25);
     
     // DRAW TIMER
-    g2.setColor(Color.decode("#111111"));
-    g2.fillRect(board[0][0].offx-27+board[0][0].size*7,board[0][0].offy-60,board[0][0].size+27,25);
-    g2.setColor(Color.decode("#ffffff"));
+    g2.setColor((turn==0) ? Color.decode("#ffffff") : Color.decode("#000000"));
+    g2.fillRect(board[0][0].offx+board[0][0].size*6,board[0][0].offy-60,board[0][0].size*2,25);
+    g2.setColor((turn==0) ? Color.decode("#000000") : Color.decode("#ffffff"));
     String timedis = String.valueOf("Time: ")+String.format("%02d",timer)+" of "+String.format("%02d",turnlen);
-    g2.drawString(timedis,board[0][0].offx-15+board[0][0].size*7,board[0][0].offy-42);
+    g.setFont(new Font("default", Font.BOLD, 16));
+    g2.drawString(timedis,board[0][0].offx+15+board[0][0].size*6,board[0][0].offy-42);
 
     // DRAW BOARD
     int toggle = 0;
