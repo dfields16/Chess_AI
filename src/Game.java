@@ -15,30 +15,31 @@ class Game extends JPanel {
 
   // MEMBER VARIABLES
 
-  BufferedImage ui;
   AI ai;
 
-  // MULTIARRAY
   Square[][] board = new Square[8][8];  
   ArrayList<Move> history;
   
-  Move  click      = new Move();
+  Point cursor;
+  Move  click;
   
   int turn = 0;
-
-  Point cursor;
+  
+  BufferedImage ui;
 
   // CONSTRUCTOR
   public Game() {    
     setLayout(null);
-    
-    history = new ArrayList<Move>();
     
     startGame();
     gameListener();
   }
   
   public void startGame(){
+    
+    history = new ArrayList<Move>();
+    click   = new Move();
+    
     loadSquares();
     loadPieces();    
   }
@@ -155,7 +156,7 @@ class Game extends JPanel {
   }
 
   public void movePiece(Move move){
-    
+
     checkCapture(move);
 
     board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
@@ -189,7 +190,7 @@ class Game extends JPanel {
     for(int y=0;y<8;y++)
     {      
       if(y==4) side--;
-      
+
       for(int x=0;x<8;x++)
       {
 
