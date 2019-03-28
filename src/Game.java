@@ -65,8 +65,6 @@ class Game extends JPanel {
     float slope = (dx==0 || dy==0) ? 0 : (float)dy / (float)dx;
     float dist  = (float) Math.sqrt(dx*dx + dy*dy);
     
-    
-    
     // IF TARGET IS ON SAME TEAM LEAVE EARLY
     if (board[click.y2()][click.x2()].piece != null && board[click.y2()][click.x2()].piece.side == board[click.y1()][click.x1()].piece.side)
       return false;
