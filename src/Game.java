@@ -144,8 +144,8 @@ class Game extends JPanel {
         if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0){
           movePiece(castle);
           valid = true;
-        }    
-      }      
+        }
+      }
     }
 
     return valid;
@@ -212,22 +212,18 @@ class Game extends JPanel {
     for(int y=0;y<8;y++)
     {      
       if(y==4) side--;
-
       for(int x=0;x<8;x++)
       {
-        type = null;
-        
+        type = null;        
         if( (y==0 || y==7) && (x==0 || x==7)) type = ChessPiece.ROOK;
         if( (y==0 || y==7) && (x==1 || x==6)) type = ChessPiece.KNIGHT;
         if( (y==0 || y==7) && (x==2 || x==5)) type = ChessPiece.BISCHOP;
-        if( (y==0 || y==7) && (x==3)) type = ChessPiece.QUEEN;
-        if( (y==0 || y==7) && (x==4)) type = ChessPiece.KING;
-        if(y==1 || y==6) type = ChessPiece.PAWN;     
-
+        if( (y==0 || y==7) && (x==3))         type = ChessPiece.QUEEN;
+        if( (y==0 || y==7) && (x==4))         type = ChessPiece.KING;
+        if(y==1 || y==6)                      type = ChessPiece.PAWN;
         if(type != null) board[y][x].piece = new Piece(type,side);
       }
     }
-
   }
 
   public boolean checkCapture(Move move){    
