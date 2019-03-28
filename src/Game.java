@@ -48,6 +48,8 @@ class Game extends JPanel {
   ///////////////////////////////////////////////////////////////////////////////
 
   public boolean validMove() {
+    
+    boolean valid = true;
 
     int x1 = click.x1();
     int y1 = click.y1();
@@ -118,15 +120,16 @@ class Game extends JPanel {
     case EMPTY:
     break;
     }
-
+    
+    if(!pawntest) valid = false;
     // CHECK FOR COLLISION
-    if( checkCollision(click.start,click.end)) return false;
+    if(checkCollision(click.start,click.end)) valid = false;
 
     //EVALUATE FINAL RESPONSE
-    if (listContains(slopes, Math.abs(slope)) && (listContains(distances, 0) || listContains(distances, dist)) && pawntest) {
-      return true;
-    }
-    return false;
+    if(!listContains(slopes, Math.abs(slope))) valid = false;
+    if(!listContains(distances, 0) && !listContains(distances, dist)) valid = false;
+
+    return valid;
   }
 
   boolean listContains(List<Float> list, float key) {
