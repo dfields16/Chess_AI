@@ -53,6 +53,7 @@ class Game extends JPanel {
     
     boolean valid    = true;
     boolean pawntest = true;
+    boolean kingtest = true;
     
     int dx = move.x2()-move.x1();
     int dy = move.y2()-move.y1();
@@ -113,34 +114,48 @@ class Game extends JPanel {
     case EMPTY:
     break;
     }
+    
     // DID PAWN PASS
     if(!pawntest) valid = false;
+    
     // CHECK FOR COLLISION
     if(checkCollision(click)) valid = false;
 
-    //EVALUATE FINAL RESPONSE
+    // EVALUATE FINAL RESPONSE
     if(!listContains(slopes, Math.abs(slope))) valid = false;
     if(!listContains(distances, 0) && !listContains(distances, dist)) valid = false;
     
-    //CAN CASTLE?
+    // CAN CASTLE?
     //If king is moving, and not in check and has not moved yet
-    if(start.type == ChessPiece.KING && start.checked==0 && start.moved==0){      
-    
-      //DETECT DIRECTION/AVAILABILITY
-      //trying to castle small side
-      System.out.println(dy+" "+dx+" "+dist);
-      if(dy==0 && dx>0 && dist==2){
-        
+    if(start.type == ChessPiece.KING && start.checked==0 && start.moved==0){  
+      
+      Square corner;
+      Move   castle;
+      // DETECT DIRECTION/AVAILABILITY
+      // trying to castle small side
+      System.out.println(dy+" "+dx+" "+dist+" "+valid);
+      if(dy==0 && dx>0 && dist==2){        
         System.out.println("small castle");
-        
-        
-        
-      //trying to castle big side
+        corner = board[move.y2()][move.x2()+1];
+        castle = new Move(corner.coord,board[move.y2()][move.x2()-1].coord,null);
+        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0 && !checkCollision(click) ){          
+          movePiece(castle);
+          valid = true;
+        }        
+      // trying to castle big side
       }else if(dy==0 && dx<0 && dist==3){
         System.out.println("big castle");
+        corner = board[move.y2()][move.x2()-1];
+        castle = new Move(corner.coord,board[move.y2()][move.x2()+1].coord,null);
+        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0){
+          movePiece(castle);
+          valid = true;
+        }    
       }
       
     }
+    
+    System.out.println(dy+" "+dx+" "+dist+" "+valid);
 
     return valid;
   }
@@ -171,6 +186,8 @@ class Game extends JPanel {
   }
 
   public void movePiece(Move move){
+    
+    board[move.y1()][move.x1()].piece.moved = 1;
 
     checkCapture(move);
 
@@ -294,9 +311,8 @@ class Game extends JPanel {
               click.end = new Point(x,y);
               
               if (validMove(click)) {
-                board[click.y1()][click.x1()].piece.moved = 1;
-                turn = (turn == 0) ? 1 : 0;
                 movePiece(click);
+                //turn = (turn == 0) ? 1 : 0;
               }
 
               valid = false;
