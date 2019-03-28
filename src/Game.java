@@ -30,7 +30,7 @@ class Game extends JPanel {
   BufferedImage ui;  
   
   // CONSTRUCTOR
-  public Game() {    
+  public Game(){
     setLayout(null);
     startGame();
     gameListener();
@@ -50,7 +50,7 @@ class Game extends JPanel {
       public void run() {        
         timer++;
         if(timer>turnlen){
-          click = new Move();
+          click.clear();
           turn = (turn==0) ? 1 : 0;
           timer = 1;
         }
