@@ -220,7 +220,7 @@ class Game extends JPanel {
         if( (y==0 || y==7) && (x==2 || x==5)) type = ChessPiece.BISCHOP;
         if( (y==0 || y==7) && (x==3))         type = ChessPiece.QUEEN;
         if( (y==0 || y==7) && (x==4))         type = ChessPiece.KING;
-        if(y==1 || y==6)                      type = ChessPiece.PAWN;
+        if  (y==1 || y==6)                    type = ChessPiece.PAWN;
         if(type != null) board[y][x].piece = new Piece(type,side);
       }
     }
