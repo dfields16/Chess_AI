@@ -46,16 +46,16 @@ class Game extends JPanel {
   // MEMBERS
   ///////////////////////////////////////////////////////////////////////////////
 
-  public boolean validMove() {
+  public boolean validMove(Move move) {
     
-    Piece start = board[click.y1()][click.x1()].piece;
-    Piece end   = board[click.y2()][click.x2()].piece;
+    Piece start = board[move.y1()][move.x1()].piece;
+    Piece end   = board[move.y2()][move.x2()].piece;
     
     boolean valid    = true;
     boolean pawntest = true;
     
-    int dx = click.x2()-click.x1();
-    int dy = click.y2()-click.y1();
+    int dx = move.x2()-move.x1();
+    int dy = move.y2()-move.y1();
     int py = (turn==0) ? (-1)*dy : dy;
 
     List<Float> slopes    = new ArrayList<>();
@@ -66,8 +66,7 @@ class Game extends JPanel {
     float dist  = (float) Math.sqrt(dx*dx + dy*dy);
     
     // IF TARGET IS ON SAME TEAM LEAVE EARLY
-    if (end != null && end.side == start.side)
-      return false;
+    if (end != null && end.side == start.side) valid = false;
     
     // ASSIGN EACH OF THE PIECES A SLOPE AND DISTANCE THEY CAN MOVE
     switch (start.type) {
@@ -117,14 +116,31 @@ class Game extends JPanel {
     // DID PAWN PASS
     if(!pawntest) valid = false;
     // CHECK FOR COLLISION
-    if(checkCollision(click.start,click.end)) valid = false;
+    if(checkCollision(click)) valid = false;
 
     //EVALUATE FINAL RESPONSE
     if(!listContains(slopes, Math.abs(slope))) valid = false;
     if(!listContains(distances, 0) && !listContains(distances, dist)) valid = false;
     
     //CAN CASTLE?
+    //If king is moving, and not in check and has not moved yet
+    if(start.type == ChessPiece.KING && start.checked==0 && start.moved==0){      
     
+      //DETECT DIRECTION/AVAILABILITY
+      //trying to castle small side
+      System.out.println(dy+" "+dx+" "+dist);
+      if(dy==0 && dx>0 && dist==2){
+        
+        System.out.println("small castle");
+        
+        
+        
+      //trying to castle big side
+      }else if(dy==0 && dx<0 && dist==3){
+        System.out.println("big castle");
+      }
+      
+    }
 
     return valid;
   }
@@ -136,17 +152,17 @@ class Game extends JPanel {
     return false;
   }
 
-  public boolean checkCollision(Point a, Point b){
-    if(board[(int)a.getY()][(int)a.getX()].piece.type != ChessPiece.KNIGHT){
-      int xp = (int)b.getX();
-      int yp = (int)b.getY();
+  public boolean checkCollision(Move move){
+    if(board[move.y1()][move.x1()].piece.type != ChessPiece.KNIGHT){
+      int xp = move.x2();
+      int yp = move.y2();
       while(true)
       {
         // increment in direction of root
-        if(xp>(int)a.getX()){xp--;}else if(xp<(int)a.getX()){xp++;}
-        if(yp>(int)a.getY()){yp--;}else if(yp<(int)a.getY()){yp++;}
+        if(xp>move.x1()){xp--;}else if(xp<move.x1()){xp++;}
+        if(yp>move.y1()){yp--;}else if(yp<move.y1()){yp++;}
         // if at root exit while
-        if(yp==(int)a.getY() && xp==(int)a.getX()) break;
+        if(yp==move.y1() && xp==move.x1()) break;
         // if piece found exit validation
         if(board[yp][xp].piece != null) return true;        
       }      
@@ -277,7 +293,7 @@ class Game extends JPanel {
               System.out.println("to " + board[y][x].coord);
               click.end = new Point(x,y);
               
-              if (validMove()) {
+              if (validMove(click)) {
                 board[click.y1()][click.x1()].piece.moved = 1;
                 turn = (turn == 0) ? 1 : 0;
                 movePiece(click);
