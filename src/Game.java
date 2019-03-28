@@ -304,16 +304,19 @@ class Game extends JPanel {
   @Override
   protected void paintComponent(Graphics g) {
     Graphics2D g2 = (Graphics2D) g;
-
+    
+    String pack = "marble";
+    
+    // DRAW BACKGROUND
     try {
-      ui = ImageIO.read(new File("./img/bg/wood.png"));
+      ui = ImageIO.read(new File("./img/"+pack+"/bg.png"));
     } catch (IOException e) {
       e.printStackTrace();
-    }
-    // DRAW BACKGROUND
+    }   
     g.drawImage(ui, 0, 0, null);
+    // DRAW TRIM
     try {
-      ui = ImageIO.read(new File("./img/bg/trim.png"));
+      ui = ImageIO.read(new File("./img/"+pack+"/trim.png"));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -347,7 +350,9 @@ class Game extends JPanel {
           g2.drawString(String.valueOf(colh), board[0][0].offx + 34 + (x * board[0][0].size), board[0][0].offy - 8);
         }
 
-        g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
+        //g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
+        g2.setColor(toggle == 1 ? Color.decode("#603f2f") : Color.decode("#dfa070") );
+        
         if( board[y][x].coord.equals(click.start) )
           g2.setColor(Color.decode("#003366"));
         g2.fill(board[y][x].shape);
@@ -358,6 +363,14 @@ class Game extends JPanel {
       toggle = toggle == 0 ? 1 : 0;
       rowh--;
     }
+    
+    // DRAW TEXTURE
+    try {
+      ui = ImageIO.read(new File("./img/"+pack+"/board.png"));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }    
+    g.drawImage(ui,board[0][0].offx,board[0][0].offy, null);
 
     // DRAW PIECES
     String fn;
@@ -365,7 +378,7 @@ class Game extends JPanel {
       for (int x = 0; x < 8; x++) {
         if (board[y][x].piece != null) {
           
-          fn = "./img/" + (board[y][x].piece.side == 0 ? "w" : "b") + "_" + board[y][x].piece.type.name().toLowerCase() + ".png";
+          fn = "./img/" + pack + "/" + (board[y][x].piece.side == 0 ? "W" : "B") + "_" + board[y][x].piece.type.name() + ".png";
           
           try {
             ui = ImageIO.read(new File(fn));
@@ -396,7 +409,7 @@ class Game extends JPanel {
       
       if(move.captured != null){
         
-        fn = "./img/" + (move.captured.side == 0 ? "w" : "b") + "_" + move.captured.type.name().toLowerCase() + ".png";
+        fn = "./img/" + pack + "/" + (move.captured.side == 0 ? "W" : "B") + "_" + move.captured.type.name() + ".png";
         
         try {
           ui = ImageIO.read(new File(fn));
