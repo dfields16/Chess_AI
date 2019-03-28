@@ -14,7 +14,6 @@ class Game extends JPanel {
   private static final long serialVersionUID = 1L;
 
   // MEMBER VARIABLES
-
   AI ai;
 
   Square[][] board = new Square[8][8];  
@@ -56,7 +55,8 @@ class Game extends JPanel {
     int dy = click.y2()-click.y1();
     int py = (turn==0) ? (-1)*dy : dy;
 
-    Piece piece = board[click.y1()][click.x1()].piece;
+    Piece start = board[click.y1()][click.x1()].piece;
+    Piece end   = board[click.y2()][click.x2()].piece;
 
     List<Float> slopes    = new ArrayList<>();
     List<Float> distances = new ArrayList<>();
@@ -66,11 +66,11 @@ class Game extends JPanel {
     float dist  = (float) Math.sqrt(dx*dx + dy*dy);
     
     // IF TARGET IS ON SAME TEAM LEAVE EARLY
-    if (board[click.y2()][click.x2()].piece != null && board[click.y2()][click.x2()].piece.side == board[click.y1()][click.x1()].piece.side)
+    if (end != null && end.side == start.side)
       return false;
     
     // ASSIGN EACH OF THE PIECES A SLOPE AND DISTANCE THEY CAN MOVE
-    switch (piece.type) {
+    switch (start.type) {
     case KING:
       slopes.add((float) 0);
       slopes.add((float) 1);
@@ -100,16 +100,16 @@ class Game extends JPanel {
       slopes.add( (float) 1);  
       distances.add((float) 1);
       distances.add( (float) Math.sqrt(2));
-      if (piece.moved == 0) distances.add((float) 2);
+      if (start.moved == 0) distances.add((float) 2);
 
       // prevent horizontal pawn movement
       if(dy==0) pawntest = false;
       // prevent backward movement
       if(py<0) pawntest = false;
       // if trying to go forward prevent capture
-      if(Math.abs(slope) == 0 && (board[click.y2()][click.x2()].piece != null) ) pawntest = false;
+      if(Math.abs(slope) == 0 && (end != null) ) pawntest = false;
       // if trying to go diagonal make sure it is a capture
-      if(Math.abs(slope) == 1 && (board[click.y2()][click.x2()].piece == null || turn == board[click.y2()][click.x2()].piece.side)) pawntest = false;
+      if(Math.abs(slope) == 1 && (end == null || turn == end.side)) pawntest = false;
     break;
     case EMPTY:
     break;
@@ -122,6 +122,9 @@ class Game extends JPanel {
     //EVALUATE FINAL RESPONSE
     if(!listContains(slopes, Math.abs(slope))) valid = false;
     if(!listContains(distances, 0) && !listContains(distances, dist)) valid = false;
+    
+    //CAN CASTLE?
+    
 
     return valid;
   }
