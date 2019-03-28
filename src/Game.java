@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.JPanel;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -215,46 +213,25 @@ class Game extends JPanel {
   public void loadPieces()
   {
     ChessPiece type = ChessPiece.PAWN;
-    int       side   = 1;
+    int        side = 1;
 
-    int w = 0;
     for(int y=0;y<8;y++)
     {      
       if(y==4) side--;
 
       for(int x=0;x<8;x++)
       {
+        type = null;
+        
+        if( (y==0 || y==7) && (x==0 || x==7)) type = ChessPiece.ROOK;
+        if( (y==0 || y==7) && (x==1 || x==6)) type = ChessPiece.KNIGHT;
+        if( (y==0 || y==7) && (x==2 || x==5)) type = ChessPiece.BISCHOP;
+        if( (y==0 || y==7) && (x==3)) type = ChessPiece.QUEEN;
+        if( (y==0 || y==7) && (x==4)) type = ChessPiece.KING;
+        if(y==1 || y==6) type = ChessPiece.PAWN;     
 
-        if( (y==0 || y==7) && (x==0 || x==7)) {
-          type = ChessPiece.ROOK;
-          w=1;
-        }
-        if( (y==0 || y==7) && (x==1 || x==6)) {
-          type = ChessPiece.KNIGHT;
-          w=1;
-        }
-        if( (y==0 || y==7) && (x==2 || x==5)) {
-          type = ChessPiece.BISCHOP;
-          w=1;
-        }
-        if( (y==0 || y==7) && (x==3)) {
-          type = ChessPiece.QUEEN;
-          w=1;
-        }
-        if( (y==0 || y==7) && (x==4)) {
-          type = ChessPiece.KING;
-          w=1;
-        }
-        if(y==1 || y==6) {
-          type = ChessPiece.PAWN;
-          w=1;
-        }        
-
-        if(w==1) {
-          board[y][x].piece = new Piece(type,side);
-        }        
-        w=0;
-      }      
+        if(type != null) board[y][x].piece = new Piece(type,side);
+      }
     }
 
   }
@@ -311,7 +288,7 @@ class Game extends JPanel {
               
               if (validMove(click)) {
                 movePiece(click);
-                //turn = (turn == 0) ? 1 : 0;
+                turn = (turn == 0) ? 1 : 0;
               }
 
               valid = false;
