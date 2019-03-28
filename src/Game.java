@@ -49,18 +49,14 @@ class Game extends JPanel {
 
   public boolean validMove() {
     
-    boolean valid = true;
-
-    int x1 = click.x1();
-    int y1 = click.y1();
-    int x2 = click.x2();
-    int y2 = click.y2();
+    boolean valid    = true;
+    boolean pawntest = true;
     
-    int dx = (turn==0) ?  (x2-x1) : (x2-x1);
-    int dy = (turn==0) ?  (y2-y1) : (y2-y1);
-    int py = (turn==0) ? -(y2-y1) : (y2-y1);
+    int dx = click.x2()-click.x1();
+    int dy = click.y2()-click.y1();
+    int py = (turn==0) ? (-1)*dy : dy;
 
-    Piece piece = board[y1][x1].piece;
+    Piece piece = board[click.y1()][click.x1()].piece;
 
     List<Float> slopes    = new ArrayList<>();
     List<Float> distances = new ArrayList<>();
@@ -69,10 +65,10 @@ class Game extends JPanel {
     float slope = (dx==0 || dy==0) ? 0 : (float)dy / (float)dx;
     float dist  = (float) Math.sqrt(dx*dx + dy*dy);
     
-    boolean pawntest = true;
+    
     
     // IF TARGET IS ON SAME TEAM LEAVE EARLY
-    if (board[y2][x2].piece != null && board[y2][x2].piece.side == board[y1][x1].piece.side)
+    if (board[click.y2()][click.x2()].piece != null && board[click.y2()][click.x2()].piece.side == board[click.y1()][click.x1()].piece.side)
       return false;
     
     // ASSIGN EACH OF THE PIECES A SLOPE AND DISTANCE THEY CAN MOVE
@@ -113,14 +109,14 @@ class Game extends JPanel {
       // prevent backward movement
       if(py<0) pawntest = false;
       // if trying to go forward prevent capture
-      if(Math.abs(slope) == 0 && (board[y2][x2].piece != null) ) pawntest = false;
+      if(Math.abs(slope) == 0 && (board[click.y2()][click.x2()].piece != null) ) pawntest = false;
       // if trying to go diagonal make sure it is a capture
-      if(Math.abs(slope) == 1 && (board[y2][x2].piece == null || turn == board[y2][x2].piece.side)) pawntest = false;
+      if(Math.abs(slope) == 1 && (board[click.y2()][click.x2()].piece == null || turn == board[click.y2()][click.x2()].piece.side)) pawntest = false;
     break;
     case EMPTY:
     break;
     }
-    
+    // DID PAWN PASS
     if(!pawntest) valid = false;
     // CHECK FOR COLLISION
     if(checkCollision(click.start,click.end)) valid = false;
