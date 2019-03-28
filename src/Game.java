@@ -53,7 +53,6 @@ class Game extends JPanel {
     
     boolean valid    = true;
     boolean pawntest = true;
-    boolean kingtest = true;
     
     int dx = move.x2()-move.x1();
     int dy = move.y2()-move.y1();
