@@ -279,9 +279,7 @@ class Game extends JPanel {
         boolean valid = false;
         
         // previously dealt with a final click, flush the trigger
-        if (click.end != null) {
-          click.clear();
-        }
+        if (click.end != null) click.clear();
 
         // SEE IF A SQUARE WAS CLICKED
         for (int y = 0; y < 8; y++) {
