@@ -130,9 +130,7 @@ class Game extends JPanel {
       Move   castle;
       // DETECT DIRECTION/AVAILABILITY
       // trying to castle small side
-      System.out.println(dy+" "+dx+" "+dist+" "+valid);
-      if(dy==0 && dx>0 && dist==2){        
-        System.out.println("small castle");
+      if(dy==0 && dx>0 && dist==2){
         corner = board[move.y2()][move.x2()+1];
         castle = new Move(corner.coord,board[move.y2()][move.x2()-1].coord,null);
         if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0 && !checkCollision(click) ){          
@@ -141,18 +139,14 @@ class Game extends JPanel {
         }        
       // trying to castle big side
       }else if(dy==0 && dx<0 && dist==3){
-        System.out.println("big castle");
         corner = board[move.y2()][move.x2()-1];
         castle = new Move(corner.coord,board[move.y2()][move.x2()+1].coord,null);
         if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0){
           movePiece(castle);
           valid = true;
         }    
-      }
-      
+      }      
     }
-    
-    System.out.println(dy+" "+dx+" "+dist+" "+valid);
 
     return valid;
   }
