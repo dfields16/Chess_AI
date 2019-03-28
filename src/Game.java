@@ -19,22 +19,21 @@ class Game extends JPanel {
 
   Square[][] board = new Square[8][8];  
   ArrayList<Move> history;
-  
+
   Point cursor;
   Move  click;
-  
+
   int turn = 0;
-  
+
   BufferedImage ui;
 
   // CONSTRUCTOR
   public Game() {    
     setLayout(null);
-    
     startGame();
     gameListener();
   }
-  
+
   public void startGame(){
     
     history = new ArrayList<Move>();
