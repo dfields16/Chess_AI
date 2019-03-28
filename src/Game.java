@@ -24,7 +24,7 @@ class Game extends JPanel {
   Move  click;
 
   int turn    = 0;
-  int turnlen = 30;
+  int turnlen = 10;
   int timer   = 0;  
   
   BufferedImage ui;  
@@ -50,6 +50,7 @@ class Game extends JPanel {
       public void run() {        
         timer++;
         if(timer>turnlen){
+          click = new Move();
           turn = (turn==0) ? 1 : 0;
           timer = 1;
         }
