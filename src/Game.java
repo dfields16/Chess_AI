@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.imageio.ImageIO;
 
 class Game extends JPanel {
@@ -20,10 +23,12 @@ class Game extends JPanel {
   Point cursor;
   Move  click;
 
-  int turn = 0;
-
-  BufferedImage ui;
-
+  int turn    = 0;
+  int turnlen = 30;
+  int timer   = 0;  
+  
+  BufferedImage ui;  
+  
   // CONSTRUCTOR
   public Game() {    
     setLayout(null);
@@ -37,7 +42,22 @@ class Game extends JPanel {
     click   = new Move();
     
     loadSquares();
-    loadPieces();    
+    loadPieces();     
+    
+    Timer clock    = new Timer();    
+    TimerTask task = new TimerTask(){
+      @Override
+      public void run() {        
+        timer++;
+        if(timer>turnlen){
+          turn = (turn==0) ? 1 : 0;
+          timer = 1;
+        }
+        repaint();
+      }
+    };
+    clock.scheduleAtFixedRate(task,1000,1000);
+    
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -184,6 +204,8 @@ class Game extends JPanel {
 
     board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
     board[move.y1()][move.x1()].piece = null;
+    
+    timer = 0;
 
     // Update Current State
     //ai.setState(board);
@@ -325,6 +347,13 @@ class Game extends JPanel {
     // DRAW TURN INDICATOR
     g2.setColor((turn == 0) ? Color.decode("#ffffff") : Color.decode("#000000"));
     g2.fillRect(board[0][0].offx - 25, board[0][0].offy - 25, 25, 25);
+    
+    // DRAW TIMER
+    g2.setColor(Color.decode("#111111"));
+    g2.fillRect(board[0][0].offx-27+board[0][0].size*7,board[0][0].offy-60,board[0][0].size+27,25);
+    g2.setColor(Color.decode("#ffffff"));
+    String timedis = String.valueOf("Time: ")+String.format("%02d",timer)+" of "+String.format("%02d",turnlen);
+    g2.drawString(timedis,board[0][0].offx-15+board[0][0].size*7,board[0][0].offy-42);
 
     // DRAW BOARD
     int toggle = 0;
