@@ -154,12 +154,12 @@ class Game extends JPanel {
     return false;
   }
 
-  public void movePiece() {
+  public void movePiece(Move move){
     
-    checkCapture();
+    checkCapture(move);
 
-    board[click.y2()][click.x2()].piece = board[click.y1()][click.x1()].piece;
-    board[click.y1()][click.x1()].piece = null;
+    board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
+    board[move.y1()][move.x1()].piece = null;
 
     // Update Current State
     //ai.setState(board);
@@ -227,11 +227,13 @@ class Game extends JPanel {
 
   }
 
-  public void checkCapture(){    
-    if( board[click.y2()][click.x2()].piece != null ){
-      history.add( new Move(click.start,click.end,board[click.y2()][click.x2()].piece) );      
+  public boolean checkCapture(Move move){    
+    if( board[move.y2()][move.x2()].piece != null ){
+      history.add( new Move(move.start,move.end,board[move.y2()][move.x2()].piece) );
+      return true;
     }else{
-      history.add( new Move(click.start,click.end,null) );
+      history.add( new Move(move.start,move.end,null) );
+      return false;
     }
   }
 
@@ -278,7 +280,7 @@ class Game extends JPanel {
               if (validMove()) {
                 board[click.y1()][click.x1()].piece.moved = 1;
                 turn = (turn == 0) ? 1 : 0;
-                movePiece();
+                movePiece(click);
               }
 
               valid = false;
