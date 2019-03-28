@@ -48,15 +48,15 @@ class Game extends JPanel {
 
   public boolean validMove() {
     
+    Piece start = board[click.y1()][click.x1()].piece;
+    Piece end   = board[click.y2()][click.x2()].piece;
+    
     boolean valid    = true;
     boolean pawntest = true;
     
     int dx = click.x2()-click.x1();
     int dy = click.y2()-click.y1();
     int py = (turn==0) ? (-1)*dy : dy;
-
-    Piece start = board[click.y1()][click.x1()].piece;
-    Piece end   = board[click.y2()][click.x2()].piece;
 
     List<Float> slopes    = new ArrayList<>();
     List<Float> distances = new ArrayList<>();
