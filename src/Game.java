@@ -381,7 +381,8 @@ class Game extends JPanel {
         }
       }
     }
-
+    
+    //DRAW THE JAILYARD
     int jxw = board[0][0].offx-board[0][0].size*2;
     int jyw = board[0][0].offy;
     
