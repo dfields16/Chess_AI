@@ -1,0 +1,8 @@
+{
+  'heading':'#000000',
+  'squareb':'#000000',
+  'squarew':'#ffffff',
+  'squareh':'#003366',
+  'squarec':'#cc0000',
+  'squarep':'#eeeeee'
+}

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.imageio.ImageIO;
 
 class Game extends JPanel {
@@ -60,6 +59,19 @@ class Game extends JPanel {
     clock.scheduleAtFixedRate(task,1000,1000);
     
   }
+  
+  public Square getKing(int side) {
+	  Square sq = null;
+	  for(int y=0;y<8;y++) {
+		  for(int x=0;x<8;x++) {
+			  if(board[y][x].piece!=null && board[y][x].piece.side == side && board[y][x].piece.type == ChessPiece.KING) {
+				  sq = board[y][x];
+				  return sq;
+			  }
+		  }
+	  }
+	  return sq;
+  }
 
   ///////////////////////////////////////////////////////////////////////////////
   // MEMBERS
@@ -69,6 +81,7 @@ class Game extends JPanel {
     
     Piece start = board[move.y1()][move.x1()].piece;
     Piece end   = board[move.y2()][move.x2()].piece;
+    
     
     boolean valid    = true;
     boolean pawntest = true;
@@ -143,9 +156,15 @@ class Game extends JPanel {
     if(!listContains(slopes, Math.abs(slope))) valid = false;
     if(!listContains(distances, 0) && !listContains(distances, dist)) valid = false;
     
+    // MOVING INTO CHECK?
+    //if(start.side == turn) {
+    //	System.out.println("check validation");
+    //	if(inCheck(turn)) valid = false;
+    //}
+    
     // CAN CASTLE?
     //If king is moving, and not in check and has not moved yet
-    if(start.type == ChessPiece.KING && start.checked==0 && start.moved==0){  
+    if(start.type == ChessPiece.KING && start.side == turn && start.checked==0 && start.moved==0){  
       
       Square corner;
       Move   castle;
@@ -180,7 +199,8 @@ class Game extends JPanel {
   }
 
   public boolean checkCollision(Move move){
-    if(board[move.y1()][move.x1()].piece.type != ChessPiece.KNIGHT){
+	// knight is allowed to pass over pieces, all others cannot
+    if(board[move.y1()][move.x1()].piece != null && board[move.y1()][move.x1()].piece.type != ChessPiece.KNIGHT){
       int xp = move.x2();
       int yp = move.y2();
       while(true)
@@ -196,18 +216,52 @@ class Game extends JPanel {
     }
     return false;
   }
+  
+  public boolean inCheck(int side) {
+	  
+	Square king = getKing(side);    
+	System.out.println(king.coord.getX()+" "+king.coord.getY());
+	  
+	boolean checked = false;
+	Move move;
+	  
+	for(int y=0;y<8;y++) {
+	  for(int x=0;x<8;x++) {
+		if(board[y][x].piece != null && board[y][x].piece.side != side) {
+		  move = new Move(board[y][x].coord,king.coord);
+		  System.out.println( move.x1() + " " + move.y1() + " " + move.x2() + " " + move.y2() );
+		  if( validMove(move) ) checked = true;
+		}
+	}
+  }
+	  
+	  return checked;
+  }
 
   public void movePiece(Move move){
-    
-    board[move.y1()][move.x1()].piece.moved = 1;
-
-    checkCapture(move);
-
-    board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
-    board[move.y1()][move.x1()].piece = null;
-    
-    timer = 0;
-
+	  
+	
+	if( checkCapture(move) ) {
+		history.add( new Move(move.start,move.end,board[move.y2()][move.x2()].piece) );
+	}else {
+		history.add( new Move(move.start,move.end,null) );
+	}	
+	
+	board[move.y1()][move.x1()].piece.moved = 1;
+	board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
+	board[move.y1()][move.x1()].piece = null;
+	  
+	if( inCheck(turn) ) {
+		undoMove();
+	}else {
+		turn = (turn == 0) ? 1 : 0;
+		timer = 0;
+		sendMove();
+	}
+	
+  }
+  
+  public void sendMove() {
     // Update Current State
     //ai.setState(board);
     //currentState.print();
@@ -217,6 +271,15 @@ class Game extends JPanel {
     if (Main.server != null && Main.server.isActive()) {
       Main.server.sendData(ai.serialize());
     }
+  }
+  
+  public void undoMove() {
+	
+	Move move = history.get(history.size() - 1);	  
+	
+    board[move.y1()][move.x1()].piece = board[move.y2()][move.x2()].piece;
+    board[move.y1()][move.x1()].piece.moved = 0;
+    board[move.y2()][move.x2()].piece = move.captured;
   }
 
   public void loadSquares() {
@@ -251,10 +314,8 @@ class Game extends JPanel {
 
   public boolean checkCapture(Move move){    
     if( board[move.y2()][move.x2()].piece != null ){
-      history.add( new Move(move.start,move.end,board[move.y2()][move.x2()].piece) );
       return true;
     }else{
-      history.add( new Move(move.start,move.end,null) );
       return false;
     }
   }
@@ -279,7 +340,9 @@ class Game extends JPanel {
         boolean valid = false;
         
         // previously dealt with a final click, flush the trigger
-        if (click.end != null) click.clear();
+        if (click.end != null) {
+          click.clear();
+        }
 
         // SEE IF A SQUARE WAS CLICKED
         for (int y = 0; y < 8; y++) {
@@ -299,7 +362,6 @@ class Game extends JPanel {
               
               if (validMove(click)) {
                 movePiece(click);
-                turn = (turn == 0) ? 1 : 0;
               }
 
               valid = false;
@@ -326,7 +388,7 @@ class Game extends JPanel {
   protected void paintComponent(Graphics g) {
     Graphics2D g2 = (Graphics2D) g;
     
-    String pack = "marble";
+    String pack = "v2";
     
     // DRAW BACKGROUND
     try {
@@ -379,8 +441,8 @@ class Game extends JPanel {
           g2.drawString(String.valueOf(colh), board[0][0].offx + 34 + (x * board[0][0].size), board[0][0].offy - 8);
         }
 
-        //g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
-        g2.setColor(toggle == 1 ? Color.decode("#603f2f") : Color.decode("#dfa070") );
+        g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
+        //g2.setColor(toggle == 1 ? Color.decode("#603f2f") : Color.decode("#dfa070") );
         
         if( board[y][x].coord.equals(click.start) )
           g2.setColor(Color.decode("#003366"));
@@ -407,7 +469,7 @@ class Game extends JPanel {
       for (int x = 0; x < 8; x++) {
         if (board[y][x].piece != null) {
           
-          fn = "./img/" + pack + "/" + (board[y][x].piece.side == 0 ? "W" : "B") + "_" + board[y][x].piece.type.name() + ".png";
+          fn = "./img/" + pack + "/" + board[y][x].size + "/" + (board[y][x].piece.side == 0 ? "W" : "B") + "_" + board[y][x].piece.type.name() + ".png";
           
           try {
             ui = ImageIO.read(new File(fn));
@@ -438,7 +500,7 @@ class Game extends JPanel {
       
       if(move.captured != null){
         
-        fn = "./img/" + pack + "/" + (move.captured.side == 0 ? "W" : "B") + "_" + move.captured.type.name() + ".png";
+        fn = "./img/" + pack + "/" + board[move.y1()][move.x1()].size + "/" + (move.captured.side == 0 ? "W" : "B") + "_" + move.captured.type.name() + ".png";
         
         try {
           ui = ImageIO.read(new File(fn));

@@ -33,8 +33,8 @@ public class Main {
         server = new TCPServer(60183);
         server.waitForConnection();
         server.setupStreams();
-
       }
+      
       Timer timer = new Timer();
       TimerTask task = new TimerTask() {
         @Override

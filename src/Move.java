@@ -13,6 +13,11 @@ class Move{
     end.setLocation(x2,y2);
   }
   
+  Move(Point f, Point t){
+    start = f;
+    end   = t;
+  }
+  
   Move(Point f, Point t,Piece c){
     start = f;
     end   = t;
