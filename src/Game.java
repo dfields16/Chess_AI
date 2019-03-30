@@ -150,7 +150,11 @@ class Game extends JPanel {
     if(!pawntest) valid = false;
     
     // CHECK FOR COLLISION
-    if(checkCollision(click)) valid = false;
+    if(checkCollision(click)) { 
+    	valid = false;
+    	System.out.println("checking collision");
+    }
+    
 
     // EVALUATE FINAL RESPONSE
     if(!listContains(slopes, Math.abs(slope))) valid = false;
@@ -201,7 +205,9 @@ class Game extends JPanel {
   public boolean checkCollision(Move move){
 	// knight is allowed to pass over pieces, all others cannot
     if(board[move.y1()][move.x1()].piece != null && board[move.y1()][move.x1()].piece.type != ChessPiece.KNIGHT){
-      int xp = move.x2();
+  	  //System.out.println(board[move.y1()][move.x1()].piece.type);
+
+    	int xp = move.x2();
       int yp = move.y2();
       while(true)
       {
@@ -223,14 +229,20 @@ class Game extends JPanel {
 	System.out.println(king.coord.getX()+" "+king.coord.getY());
 	  
 	boolean checked = false;
+	king.piece.checked = 0;
 	Move move;
 	  
 	for(int y=0;y<8;y++) {
 	  for(int x=0;x<8;x++) {
 		if(board[y][x].piece != null && board[y][x].piece.side != side) {
-		  move = new Move(board[y][x].coord,king.coord);
-		  System.out.println( move.x1() + " " + move.y1() + " " + move.x2() + " " + move.y2() );
-		  if( validMove(move) ) checked = true;
+		  move = new Move(board[y][x].coord, king.coord);
+		  //System.out.println( move.x1() + " " + move.y1() + " " + move.x2() + " " + move.y2() );
+		  if(!checkCollision(move) && validMove(move)) {
+			checked = true;
+			king.piece.checked = 1;
+	  	    System.out.println("checked by " + board[y][x].piece.type);
+		  }
+		 
 		}
 	}
   }
@@ -251,9 +263,17 @@ class Game extends JPanel {
 	board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
 	board[move.y1()][move.x1()].piece = null;
 	  
+	int opponent;
+	if(turn == 0) opponent = 1;
+	else opponent = 0;
+	
 	if( inCheck(turn) ) {
 		undoMove();
-	}else {
+	}
+	else if(inCheck(opponent)) {
+		//System.out.println("CHECK");
+	}
+	else {
 		turn = (turn == 0) ? 1 : 0;
 		timer = 0;
 		sendMove();
