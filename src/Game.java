@@ -229,10 +229,10 @@ class Game extends JPanel {
     
     boolean valid    = true;
     boolean pawntest = true;
-    
+
     int dx = move.x2()-move.x1();
     int dy = move.y2()-move.y1();
-    int py = (turn==0) ? (-1)*dy : dy;
+    int py = (start.side==0) ? (-1)*dy : dy;
 
     List<Float> slopes    = new ArrayList<>();
     List<Float> distances = new ArrayList<>();
@@ -275,7 +275,7 @@ class Game extends JPanel {
       slopes.add( (float) 1);  
       distances.add((float) 1);
       distances.add( (float) Math.sqrt(2));
-      if (start.moved == false) distances.add((float) 2);
+      if (!start.moved) distances.add((float) 2);
 
       // prevent horizontal pawn movement
       if(dy==0) pawntest = false;
@@ -284,7 +284,7 @@ class Game extends JPanel {
       // if trying to go forward prevent capture
       if(Math.abs(slope) == 0 && (end != null) ) pawntest = false;
       // if trying to go diagonal make sure it is a capture
-      if(Math.abs(slope) == 1 && (end == null || turn == end.side)) pawntest = false;
+      if(Math.abs(slope) == 1 && (end == null || start.side == end.side)) pawntest = false;
     break;
     case EMPTY:
     break;
