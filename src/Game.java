@@ -308,7 +308,7 @@ class Game extends JPanel {
     
     // CAN CASTLE?
     //If king is moving, and not in check and has not moved yet
-    if(start.type == ChessPiece.KING && start.side == turn && start.checked==false && start.moved==false){  
+    if(start.type == ChessPiece.KING && start.side == turn && start.checked==false && start.moved==false){
       
       Square corner;
       Move   castle;
@@ -317,7 +317,7 @@ class Game extends JPanel {
       if(dy==0 && dx>0 && dist==2){
         corner = board[move.y2()][move.x2()+1];
         castle = new Move(corner.coord,board[move.y2()][move.x2()-1].coord,null);
-        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==false && !checkCollision(click) ){          
+        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==false && !checkCollision(move) ){
           movePiece(castle);
           valid = true;
         }        
