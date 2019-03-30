@@ -23,7 +23,7 @@ class Game extends JPanel {
   Move  click;
 
   int turn    = 0;
-  int turnlen = 10;
+  int turnlen = 59;
   int timer   = 0;  
   
   BufferedImage ui;  
@@ -36,13 +36,13 @@ class Game extends JPanel {
   }
 
   public void startGame(){
-    
+
     history = new ArrayList<Move>();
     click   = new Move();
-    
+
     loadSquares();
     loadPieces();     
-    
+
     Timer clock    = new Timer();    
     TimerTask task = new TimerTask(){
       @Override
@@ -57,31 +57,175 @@ class Game extends JPanel {
       }
     };
     clock.scheduleAtFixedRate(task,1000,1000);
-    
+
   }
   
-  public Square getKing(int side) {
-	  Square sq = null;
-	  for(int y=0;y<8;y++) {
-		  for(int x=0;x<8;x++) {
-			  if(board[y][x].piece!=null && board[y][x].piece.side == side && board[y][x].piece.type == ChessPiece.KING) {
-				  sq = board[y][x];
-				  return sq;
-			  }
-		  }
-	  }
-	  return sq;
-  }
-
   ///////////////////////////////////////////////////////////////////////////////
   // MEMBERS
   ///////////////////////////////////////////////////////////////////////////////
+  
+  public Square getKing(int side) {
+    Square sq = null;
+    for(int y=0;y<8;y++) {
+	  for(int x=0;x<8;x++) {
+		if(board[y][x].piece!=null && board[y][x].piece.side == side && board[y][x].piece.type == ChessPiece.KING) {
+		  sq = board[y][x];
+		  return sq;
+		}
+	  }
+    }
+    return sq;
+  }
 
-  public boolean validMove(Move move) {
+  
+
+  boolean listContains(List<Float> list, float key) {
+    for (float elem : list)
+      if (elem == key)
+        return true;
+    return false;
+  }
+
+  public boolean checkCollision(Move move){
+	// knight is allowed to pass over pieces, all others cannot
+    if(board[move.y1()][move.x1()].piece != null && board[move.y1()][move.x1()].piece.type != ChessPiece.KNIGHT){
+      int xp = move.x2();
+      int yp = move.y2();
+      while(true)
+      {
+        // increment in direction of root
+        if(xp>move.x1()){xp--;}else if(xp<move.x1()){xp++;}
+        if(yp>move.y1()){yp--;}else if(yp<move.y1()){yp++;}
+        // if at root exit while
+        if(yp==move.y1() && xp==move.x1()) break;
+        // if piece found exit validation
+        if(board[yp][xp].piece != null) return true;        
+      }      
+    }
+    return false;
+  }
+  
+  public boolean inCheck(int side) {
+	  
+	Square king = getKing(side);
+	System.out.println(king.coord.getX()+" "+king.coord.getY());
+
+	boolean checked = false;
+	Move move;
+	  
+	for(int y=0;y<8;y++) {
+	  for(int x=0;x<8;x++) {
+		if(board[y][x].piece != null && board[y][x].piece.side != side) {
+		  move = new Move(board[y][x].coord,king.coord);
+		  System.out.println( move.x1() + " " + move.y1() + " " + move.x2() + " " + move.y2() );
+		  if( validMove(move) ) checked = true;
+		}
+	  }
+	}
+
+	if(checked) {
+		king.piece.checked = true;
+	}else {
+		king.piece.checked = false;
+	}
+
+	return checked;
+  }
+
+  public void movePiece(Move move){
+
+	if( checkCapture(move) ) {
+		history.add( new Move(move.start,move.end,board[move.y2()][move.x2()].piece) );
+		System.out.println("captured");
+	}else {
+		history.add( new Move(move.start,move.end,null) );
+		System.out.println("not captured");
+	}	
+	
+    board[move.y1()][move.x1()].piece.moved = true;
+	board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
+	board[move.y1()][move.x1()].piece = null;
+	  
+	// see if we moved into
+	if( inCheck(turn) ) {		
+		undoMove();
+	}else {
+		// see if they are in check
+		if( inCheck((turn==0) ? 1 : 0) ) {
+			
+		}
+		
+		turn = (turn == 0) ? 1 : 0;
+		timer = 0;
+		sendMove();
+	}
+	
+  }
+  
+  public void sendMove() {
+    // Update Current State
+    //ai.setState(board);
+    //currentState.print();
+    //if (Main.client != null && Main.client.isActive()) {
+    //  Main.client.sendData(ai.serialize());
+    //}
+    //if (Main.server != null && Main.server.isActive()) {
+    //  Main.server.sendData(ai.serialize());
+    //}
+  }
+  
+  public void undoMove() {	
+	Move move = history.get(history.size() - 1);	  
+	
+    board[move.y1()][move.x1()].piece = board[move.y2()][move.x2()].piece;
+    board[move.y1()][move.x1()].piece.moved = false;
+    board[move.y2()][move.x2()].piece = move.captured;
     
+    history.remove(history.size() - 1);
+  }
+
+  public void loadSquares() {
+    for (int y = 0; y < 8; y++) {
+      for (int x = 0; x < 8; x++) {
+        board[y][x] = new Square(x,y);
+      }
+    }
+  }
+
+  public void loadPieces()
+  {
+    ChessPiece type = ChessPiece.PAWN;
+    int        side = 1;
+
+    for(int y=0;y<8;y++)
+    {      
+      if(y==4) side--;
+      for(int x=0;x<8;x++)
+      {
+        type = null;        
+        if( (y==0 || y==7) && (x==0 || x==7)) type = ChessPiece.ROOK;
+        if( (y==0 || y==7) && (x==1 || x==6)) type = ChessPiece.KNIGHT;
+        if( (y==0 || y==7) && (x==2 || x==5)) type = ChessPiece.BISCHOP;
+        if( (y==0 || y==7) && (x==3))         type = ChessPiece.QUEEN;
+        if( (y==0 || y==7) && (x==4))         type = ChessPiece.KING;
+        if  (y==1 || y==6)                    type = ChessPiece.PAWN;
+        if(type != null) board[y][x].piece = new Piece(type,side);
+      }
+    }
+  }
+
+  public boolean checkCapture(Move move){    
+    if( board[move.y2()][move.x2()].piece != null ){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  
+  public boolean validMove(Move move) {
+	    
     Piece start = board[move.y1()][move.x1()].piece;
     Piece end   = board[move.y2()][move.x2()].piece;
-    
     
     boolean valid    = true;
     boolean pawntest = true;
@@ -131,7 +275,7 @@ class Game extends JPanel {
       slopes.add( (float) 1);  
       distances.add((float) 1);
       distances.add( (float) Math.sqrt(2));
-      if (start.moved == 0) distances.add((float) 2);
+      if (start.moved == false) distances.add((float) 2);
 
       // prevent horizontal pawn movement
       if(dy==0) pawntest = false;
@@ -150,11 +294,7 @@ class Game extends JPanel {
     if(!pawntest) valid = false;
     
     // CHECK FOR COLLISION
-    if(checkCollision(click)) { 
-    	valid = false;
-    	System.out.println("checking collision");
-    }
-    
+    if(checkCollision(move)) valid = false;
 
     // EVALUATE FINAL RESPONSE
     if(!listContains(slopes, Math.abs(slope))) valid = false;
@@ -168,7 +308,7 @@ class Game extends JPanel {
     
     // CAN CASTLE?
     //If king is moving, and not in check and has not moved yet
-    if(start.type == ChessPiece.KING && start.side == turn && start.checked==0 && start.moved==0){  
+    if(start.type == ChessPiece.KING && start.side == turn && start.checked==false && start.moved==false){  
       
       Square corner;
       Move   castle;
@@ -177,7 +317,7 @@ class Game extends JPanel {
       if(dy==0 && dx>0 && dist==2){
         corner = board[move.y2()][move.x2()+1];
         castle = new Move(corner.coord,board[move.y2()][move.x2()-1].coord,null);
-        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0 && !checkCollision(click) ){          
+        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==false && !checkCollision(click) ){          
           movePiece(castle);
           valid = true;
         }        
@@ -185,7 +325,7 @@ class Game extends JPanel {
       }else if(dy==0 && dx<0 && dist==3){
         corner = board[move.y2()][move.x2()-1];
         castle = new Move(corner.coord,board[move.y2()][move.x2()+1].coord,null);
-        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0){
+        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==false){
           movePiece(castle);
           valid = true;
         }
@@ -193,151 +333,6 @@ class Game extends JPanel {
     }
 
     return valid;
-  }
-
-  boolean listContains(List<Float> list, float key) {
-    for (float elem : list)
-      if (elem == key)
-        return true;
-    return false;
-  }
-
-  public boolean checkCollision(Move move){
-	// knight is allowed to pass over pieces, all others cannot
-    if(board[move.y1()][move.x1()].piece != null && board[move.y1()][move.x1()].piece.type != ChessPiece.KNIGHT){
-  	  //System.out.println(board[move.y1()][move.x1()].piece.type);
-
-    	int xp = move.x2();
-      int yp = move.y2();
-      while(true)
-      {
-        // increment in direction of root
-        if(xp>move.x1()){xp--;}else if(xp<move.x1()){xp++;}
-        if(yp>move.y1()){yp--;}else if(yp<move.y1()){yp++;}
-        // if at root exit while
-        if(yp==move.y1() && xp==move.x1()) break;
-        // if piece found exit validation
-        if(board[yp][xp].piece != null) return true;        
-      }      
-    }
-    return false;
-  }
-  
-  public boolean inCheck(int side) {
-	  
-	Square king = getKing(side);    
-	System.out.println(king.coord.getX()+" "+king.coord.getY());
-	  
-	boolean checked = false;
-	king.piece.checked = 0;
-	Move move;
-	  
-	for(int y=0;y<8;y++) {
-	  for(int x=0;x<8;x++) {
-		if(board[y][x].piece != null && board[y][x].piece.side != side) {
-		  move = new Move(board[y][x].coord, king.coord);
-		  //System.out.println( move.x1() + " " + move.y1() + " " + move.x2() + " " + move.y2() );
-		  if(!checkCollision(move) && validMove(move)) {
-			checked = true;
-			king.piece.checked = 1;
-	  	    System.out.println("checked by " + board[y][x].piece.type);
-		  }
-		 
-		}
-	}
-  }
-	  
-	  return checked;
-  }
-
-  public void movePiece(Move move){
-	  
-	
-	if( checkCapture(move) ) {
-		history.add( new Move(move.start,move.end,board[move.y2()][move.x2()].piece) );
-	}else {
-		history.add( new Move(move.start,move.end,null) );
-	}	
-	
-	board[move.y1()][move.x1()].piece.moved = 1;
-	board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
-	board[move.y1()][move.x1()].piece = null;
-	  
-	int opponent;
-	if(turn == 0) opponent = 1;
-	else opponent = 0;
-	
-	if( inCheck(turn) ) {
-		undoMove();
-	}
-	else if(inCheck(opponent)) {
-		//System.out.println("CHECK");
-	}
-	else {
-		turn = (turn == 0) ? 1 : 0;
-		timer = 0;
-		sendMove();
-	}
-	
-  }
-  
-  public void sendMove() {
-    // Update Current State
-    //ai.setState(board);
-    //currentState.print();
-    if (Main.client != null && Main.client.isActive()) {
-      Main.client.sendData(ai.serialize());
-    }
-    if (Main.server != null && Main.server.isActive()) {
-      Main.server.sendData(ai.serialize());
-    }
-  }
-  
-  public void undoMove() {
-	
-	Move move = history.get(history.size() - 1);	  
-	
-    board[move.y1()][move.x1()].piece = board[move.y2()][move.x2()].piece;
-    board[move.y1()][move.x1()].piece.moved = 0;
-    board[move.y2()][move.x2()].piece = move.captured;
-  }
-
-  public void loadSquares() {
-    for (int y = 0; y < 8; y++) {
-      for (int x = 0; x < 8; x++) {
-        board[y][x] = new Square(x,y);
-      }
-    }
-  }
-
-  public void loadPieces()
-  {
-    ChessPiece type = ChessPiece.PAWN;
-    int        side = 1;
-
-    for(int y=0;y<8;y++)
-    {      
-      if(y==4) side--;
-      for(int x=0;x<8;x++)
-      {
-        type = null;        
-        if( (y==0 || y==7) && (x==0 || x==7)) type = ChessPiece.ROOK;
-        if( (y==0 || y==7) && (x==1 || x==6)) type = ChessPiece.KNIGHT;
-        if( (y==0 || y==7) && (x==2 || x==5)) type = ChessPiece.BISCHOP;
-        if( (y==0 || y==7) && (x==3))         type = ChessPiece.QUEEN;
-        if( (y==0 || y==7) && (x==4))         type = ChessPiece.KING;
-        if  (y==1 || y==6)                    type = ChessPiece.PAWN;
-        if(type != null) board[y][x].piece = new Piece(type,side);
-      }
-    }
-  }
-
-  public boolean checkCapture(Move move){    
-    if( board[move.y2()][move.x2()].piece != null ){
-      return true;
-    }else{
-      return false;
-    }
   }
 
   public void gameListener() {
