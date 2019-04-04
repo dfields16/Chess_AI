@@ -21,7 +21,7 @@ class Game extends JPanel {
 
   Point cursor;
   Move  click;
-
+//
   int turn    = 0;
   int turnlen = 59;
   int timer   = 0;  
@@ -104,6 +104,99 @@ class Game extends JPanel {
     }
     return false;
   }
+  /*
+  public boolean isCheckmate(int side) {
+	  side = (side == 0) ? 1 : 0;
+	  Square king = getKing(side);
+	  boolean checkmate = true;
+	  int x1 = (int) king.coord.getX();
+	  int y1 = (int) king.coord.getY();
+	  System.out.println(king.coord.getX()+" "+king.coord.getY());
+
+	  int[] caseValid = new int[8]; // squares king can go
+	  Point newKing;
+	  for(int y = 0; y < 8; y++) {
+		  for(int x = 0; x < 8; x++) {
+			  Point moveLoc = new Point(x,y);
+			  if(board[y][x].piece != null && board[y][x].piece.side != side) {
+				  if(x1+1 < 8 && board[y1][x1+1].piece != null) {
+					   newKing = new Point(x1+1, y1);
+					   Move tempMove = new Move(moveLoc, newKing);
+					   if(validMove(tempMove)) {
+						  caseValid[0]++;	  
+					   }
+				  }
+				  if(y1+1 < 8 && board[y1+1][x1].piece != null) {
+					  newKing = new Point(x1, y1+1);
+					  Move tempMove = new Move(moveLoc, newKing);
+					  if(validMove(tempMove)) {
+						  caseValid[1]++;
+					  }
+					  
+				  }
+				  if(y1+1 < 8 && x1+1 < 8 && board[y1+1][x1+1].piece != null) {	
+					  newKing = new Point(x1+1, y1+1);
+					  Move tempMove = new Move(moveLoc, newKing);
+					  if(validMove(tempMove)) {
+						  caseValid[2]++;
+					  }
+					  
+				  }
+				  if(y1-1 >0 && board[y1-1][x1].piece != null) {
+					  newKing = new Point(x1, y1-1);
+					  Move tempMove = new Move(moveLoc, newKing);
+					  if(validMove(tempMove)) {
+						  caseValid[3]++;
+					  }
+					  
+				  }
+				  if(x1-1 >0 && board[y1][x1-1].piece != null) {
+					  newKing = new Point(x1-1, y1);
+					  Move tempMove = new Move(moveLoc, newKing);
+					  if(validMove(tempMove)) {
+						  caseValid[4]++;
+					  }
+					  
+				  }
+				  if(y1-1 > 0 && x1-1 > 0 && board[y1-1][x1-1].piece != null) {
+					  newKing = new Point(x1-1, y1-1);
+					  Move tempMove = new Move(moveLoc, newKing);
+					  if(validMove(tempMove)) {
+						  caseValid[5]++;
+					  }
+					  
+				  }
+				  if(y1-1 > 0 && x1+1 < 8 && board[y1-1][x1+1].piece != null) {	
+					  newKing = new Point(x1+1, y1-1);
+					  Move tempMove = new Move(moveLoc, newKing);
+					  if(validMove(tempMove)) {
+						  caseValid[6]++;
+					  }
+					  
+
+				  }
+				  if(y1+1 < 8 && x1-1 > 0 && board[y1+1][x1-1].piece != null) {
+					  newKing = new Point(x1-1, y1+1);
+					  Move tempMove = new Move(moveLoc, newKing);
+					  if(validMove(tempMove)) {
+						  caseValid[7]++;
+					  }
+					  
+				  }
+			  }
+		  }
+	  }
+	  for(int z = 0; z < 8; z++) {
+		if(caseValid[z] == 0) {
+			checkmate = false;
+			//break;
+		}
+	  }
+	  
+	  
+	  return checkmate;
+  }*/
+  
   
   public boolean inCheck(int side) {
 	  
@@ -117,16 +210,16 @@ class Game extends JPanel {
 	  for(int x=0;x<8;x++) {
 		if(board[y][x].piece != null && board[y][x].piece.side != side) {
 		  move = new Move(board[y][x].coord,king.coord);
-		  System.out.println( move.x1() + " " + move.y1() + " " + move.x2() + " " + move.y2() );
+		  //System.out.println( move.x1() + " " + move.y1() + " " + move.x2() + " " + move.y2() );
 		  if( validMove(move) ) checked = true;
 		}
 	  }
 	}
 
 	if(checked) {
-		king.piece.checked = true;
+		king.piece.checked = 1;
 	}else {
-		king.piece.checked = false;
+		king.piece.checked = 0;
 	}
 
 	return checked;
@@ -142,18 +235,26 @@ class Game extends JPanel {
 		System.out.println("not captured");
 	}	
 	
-    board[move.y1()][move.x1()].piece.moved = true;
+    board[move.y1()][move.x1()].piece.moved = 1;
 	board[move.y2()][move.x2()].piece = board[move.y1()][move.x1()].piece;
 	board[move.y1()][move.x1()].piece = null;
 	  
 	// see if we moved into
+	int opponent = (turn == 0) ? 1 : 0;
+	
+//	if(isCheckmate(opponent)){
+//		System.out.println("Checkmate");
+//	}
+	
 	if( inCheck(turn) ) {		
 		undoMove();
+		
 	}else {
 		// see if they are in check
 		if( inCheck((turn==0) ? 1 : 0) ) {
-			
+			System.out.println("Check");
 		}
+		
 		
 		turn = (turn == 0) ? 1 : 0;
 		timer = 0;
@@ -178,7 +279,7 @@ class Game extends JPanel {
 	Move move = history.get(history.size() - 1);	  
 	
     board[move.y1()][move.x1()].piece = board[move.y2()][move.x2()].piece;
-    board[move.y1()][move.x1()].piece.moved = false;
+    board[move.y1()][move.x1()].piece.moved = 0;
     board[move.y2()][move.x2()].piece = move.captured;
     
     history.remove(history.size() - 1);
@@ -226,7 +327,7 @@ class Game extends JPanel {
 	    
     Piece start = board[move.y1()][move.x1()].piece;
     Piece end   = board[move.y2()][move.x2()].piece;
-    
+        
     boolean valid    = true;
     boolean pawntest = true;
 
@@ -275,7 +376,7 @@ class Game extends JPanel {
       slopes.add( (float) 1);  
       distances.add((float) 1);
       distances.add( (float) Math.sqrt(2));
-      if (!start.moved) distances.add((float) 2);
+      if (start.moved == 0) distances.add((float) 2);
 
       // prevent horizontal pawn movement
       if(dy==0) pawntest = false;
@@ -308,7 +409,7 @@ class Game extends JPanel {
     
     // CAN CASTLE?
     //If king is moving, and not in check and has not moved yet
-    if(start.type == ChessPiece.KING && start.side == turn && start.checked==false && start.moved==false){
+    if(start.type == ChessPiece.KING && start.side == turn && start.checked==0 && start.moved==0){
       
       Square corner;
       Move   castle;
@@ -317,7 +418,7 @@ class Game extends JPanel {
       if(dy==0 && dx>0 && dist==2){
         corner = board[move.y2()][move.x2()+1];
         castle = new Move(corner.coord,board[move.y2()][move.x2()-1].coord,null);
-        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==false && !checkCollision(move) ){
+        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0 && !checkCollision(move) ){
           movePiece(castle);
           valid = true;
         }        
@@ -325,7 +426,7 @@ class Game extends JPanel {
       }else if(dy==0 && dx<0 && dist==3){
         corner = board[move.y2()][move.x2()-1];
         castle = new Move(corner.coord,board[move.y2()][move.x2()+1].coord,null);
-        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==false){
+        if( corner.piece.type == ChessPiece.ROOK && corner.piece.moved==0){
           movePiece(castle);
           valid = true;
         }
