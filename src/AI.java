@@ -21,7 +21,6 @@ public class AI {
     }
 
     public ArrayList<Move> potentialMoves(Square[][] presentState, int side) {
-
         ArrayList<Move> foundMoves = new ArrayList<Move>();
 
         for (int y = 0; y < 8; y++) {
@@ -29,10 +28,10 @@ public class AI {
                 if (presentState[y][x].piece != null && presentState[y][x].piece.side == side) {
                     for (int y2 = 0; y2 < 8; y2++) {
                         for (int x2 = 0; x2 < 8; x2++) {
-                            if (game.board[y][x].piece != null && game.board[y2][x2].piece != null
-                                    && game.board[y][x].piece.side == side) {
+                            if (presentState[y][x].piece != null && presentState[y2][x2].piece != null
+                                    && presentState[y][x].piece.side == side) {
                                 Move testMove = new Move(x, y, x2, y2);
-                                if (Util.validMove(state, testMove, game.turn)) {
+                                if (Util.validMove(state, testMove, side)) {
                                     foundMoves.add(testMove);
                                 }
                             }
@@ -46,37 +45,32 @@ public class AI {
     }
 
     public int miniMax(boolean Max, int depth, Square[][] state) {
-        int tempSide = (Max == true) ? 1 : 0;
-        ArrayList<Move> allMoves = potentialMoves(state, tempSide);
+        // int tempSide = (Max == true) ? 1 : 0;
+        ArrayList<Move> allMoves;
 
         if (depth == 0) {
             return heuristic(state);
             // return bestMove(state, true);
-        }
-        if (Max) {
+        } else if (Max) {
             int maxVal = 99999;
-            potentialMoves(state, 1);
-            for (int i = 0; i < allMoves.size(); i++) {
+            allMoves = potentialMoves(state, 1);
 
+            for (int i = 0; i < allMoves.size(); i++) {
                 state = Util.movePiece(state, allMoves.get(i));
-                // state = Util.board;
                 maxVal = Math.max(maxVal, miniMax(!Max, depth - 1, state));
                 Util.undoMove(state);
             }
             return maxVal;
-
         } else {
             int minVal = -99999;
-            potentialMoves(state, 0);
+            allMoves = potentialMoves(state, 0);
 
             for (int i = 0; i < allMoves.size(); i++) {
                 state = Util.movePiece(state, allMoves.get(i));
-                // state = game.board;
                 minVal = Math.min(minVal, miniMax(Max, depth - 1, state));
                 Util.undoMove(state);
             }
             return minVal;
-
         }
     }
 

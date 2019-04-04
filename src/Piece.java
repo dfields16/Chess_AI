@@ -1,16 +1,11 @@
 enum ChessPiece {
-	EMPTY 	(0), 
-	KING 	(100), 
-	QUEEN 	(75), 
-	BISCHOP (25), 
-	KNIGHT	(50), 
-	ROOK 	(25), 
-	PAWN 	(10);
-	
+  EMPTY(0), KING(1000), QUEEN(100), BISCHOP(50), KNIGHT(75), ROOK(50), PAWN(25);
 
-	final int value;
-	
-	ChessPiece (int v){value = v;}
+  final int value;
+
+  ChessPiece(int v) {
+    value = v;
+  }
 
 }
 
@@ -24,7 +19,7 @@ class Piece {
   int checked;
 
   public Piece(ChessPiece p, int c) {
-//	int i = ChessPiece.BISCHOP.value;
+    // int i = ChessPiece.BISCHOP.value;
     type = p;
     side = c;
   }

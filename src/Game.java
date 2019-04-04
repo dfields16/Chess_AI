@@ -35,6 +35,7 @@ class Game extends JPanel {
     startGame();
     gameListener();
     gameManager = this;
+    AI cpu = new AI(this);
   }
 
   public void startGame() {
@@ -334,6 +335,9 @@ class Game extends JPanel {
               if (Util.validMove(board, click, turn)) {
                 turn = (turn == 0) ? 1 : 0;
                 Util.updateUI(Util.movePiece(board, click), gameManager);
+
+                // IF AI Enabled
+                // Move move = ai.miniMax(turn == 0, 3, board);
               }
 
               valid = false;
