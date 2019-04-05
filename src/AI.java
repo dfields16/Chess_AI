@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class AI {
 
-    public Square[][] state;
+    // public Square[][] state;
     private Game game;
 
     public AI() {
@@ -13,6 +13,60 @@ public class AI {
 
     public AI(Game g) {
         game = g;
+    }
+
+    public Pair maxFun(Square[][] board, int depth, int maxDepth) {
+        Util.print(board);
+        Pair p = new Pair(board, 0);
+        if (depth >= maxDepth) {
+            p.second = heuristic(board);
+        } else {
+            ArrayList<Move> potentialM = potentialMoves(board, 1);
+            int topScore = -1000000;
+            int topBoardNo = 0;
+            for (int i = 0; i < potentialM.size(); i++) {
+                Square[][] curr = Util.movePiece(board, potentialM.get(i));
+
+                Pair pair = minFun(curr, depth + 1, maxDepth);
+                if (pair.second > topScore) {
+                    topBoardNo = i;
+                    topScore = pair.second;
+                    p = pair;
+                }
+            }
+        }
+
+        return p;
+    }
+
+    public Pair minFun(Square[][] board, int depth, int maxDepth) {
+        Util.print(board);
+        Pair p = new Pair(board, 0);
+        if (depth >= maxDepth) {
+            p.second = heuristic(board);
+        } else {
+            ArrayList<Move> potentialM = potentialMoves(board, 0);
+            int lowScore = 1000000;
+            int topBoardNo = 0;
+            for (int i = 0; i < potentialM.size(); i++) {
+                Square[][] curr = Util.movePiece(board, potentialM.get(i));
+                // if (Util.inCheck(curr, 0)) continue;
+                Pair pair = maxFun(curr, depth + 1, maxDepth);
+                if (pair.second < lowScore) {
+                    topBoardNo = i;
+                    lowScore = pair.second;
+                    p = pair;
+                }
+            }
+
+        }
+
+        return p;
+    }
+
+    public Square[][] MiniMax(Square[][] squares, int turn, int currDepth, int maxDepth) {
+
+        return null;
     }
 
     public void setState(Square[][] squares) {
@@ -28,10 +82,9 @@ public class AI {
                 if (presentState[y][x].piece != null && presentState[y][x].piece.side == side) {
                     for (int y2 = 0; y2 < 8; y2++) {
                         for (int x2 = 0; x2 < 8; x2++) {
-                            if (presentState[y][x].piece != null && presentState[y2][x2].piece != null
-                                    && presentState[y][x].piece.side == side) {
-                                Move testMove = new Move(x, y, x2, y2);
-                                if (Util.validMove(state, testMove, side)) {
+                            if (presentState[y2][x2].piece != null && presentState[y][x].piece.side == side) {
+                                Move testMove = new Move(new Point(x, y), new Point(x2, y2));
+                                if (Util.validMove(presentState, testMove, side)) {
                                     foundMoves.add(testMove);
                                 }
                             }
@@ -117,6 +170,8 @@ public class AI {
         int val = 0;
         for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board[y].length; x++) {
+                if (board[y][x].piece == null)
+                    continue;
                 if (board[y][x].piece.side == game.turn) {
                     val += board[y][x].piece.type.value;
                 } else {
@@ -127,37 +182,7 @@ public class AI {
         return val;
     }
 
-    public void clear() {
-        for (Square[] sqrs : state) {
-            Arrays.fill(sqrs, null);
-        }
-    }
-
-    public void print() {
-        System.out.println("=================================================================");
-        for (int x = 0; x < state.length; x++) {
-            String line = "|";
-            String border = "|=======";
-            for (int y = 0; y < state[x].length; y++) {
-                if (state[x][y].piece.type == ChessPiece.EMPTY) {
-                    line += "\t|";
-                } else {
-                    line += state[x][y].piece.type.toString().substring(0, 4) + "\t|";
-                }
-                if (y != state[x].length - 1)
-                    border += "|=======";
-            }
-            border += "|";
-            System.out.println(line.substring(0, line.length() - 1) + "|");
-            if (x != state.length - 1)
-                System.out.println(border);
-            else
-                System.out.println("=================================================================");
-
-        }
-    }
-
-    public String serialize() {
+    public String serialize(Square[][] state) {
         String dat = "";
         for (int y = 0; y < state.length; y++) {
             for (int x = 0; x < state.length; x++) {
@@ -178,8 +203,8 @@ public class AI {
         return tmp;
     }
 
-    public static AI deserialize(String str) {
-        AI dState = new AI();
+    public static Square[][] deserialize(String str) {
+        Square[][] dState = new Square[8][8];
         for (String s : str.split(",")) {
             String[] dat = s.split(":");
             Piece p = new Piece(ChessPiece.valueOf(dat[0]), ((dat[1].equals("WHITE")) ? 0 : 1));
@@ -190,12 +215,26 @@ public class AI {
                 p = null;
             Square sqr = new Square(x, y);
             sqr.piece = p;
-            dState.state[y][x] = sqr;
+            dState[y][x] = sqr;
         }
         return dState;
     }
 
-    public boolean equals(AI s) {
-        return this.serialize().equals(s.serialize());
+    public boolean equals(Square[][] s1, Square[][] s2) {
+        return this.serialize(s1).equals(serialize(s2));
+    }
+}
+
+class Pair {
+    Square[][] first;
+    int second;
+
+    public Pair() {
+
+    }
+
+    public Pair(Square[][] f, int s) {
+        first = f;
+        second = s;
     }
 }

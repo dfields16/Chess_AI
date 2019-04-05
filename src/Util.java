@@ -38,10 +38,10 @@ public class Util {
 
         if (checkCapture(board, move)) {
             history.add(new Move(move.start, move.end, board[move.y2()][move.x2()].piece));
-            System.out.println("captured");
+            // System.out.println("captured");
         } else {
             history.add(new Move(move.start, move.end, null));
-            System.out.println("not captured");
+            // System.out.println("not captured");
         }
 
         board[move.y1()][move.x1()].piece.moved = 1;
@@ -103,7 +103,6 @@ public class Util {
     }
 
     public static boolean validMove(Square[][] board, Move move, int turn) {
-
         Piece start = board[move.y1()][move.x1()].piece;
         Piece end = board[move.y2()][move.x2()].piece;
 
@@ -279,6 +278,30 @@ public class Util {
             for (int x = 0; x < board[y].length; x++) {
                 g.board[y][x] = board[y][x];
             }
+        }
+    }
+
+    static public void print(Square[][] state) {
+        System.out.println("=================================================================");
+        for (int x = 0; x < state.length; x++) {
+            String line = "|";
+            String border = "|=======";
+            for (int y = 0; y < state[x].length; y++) {
+                if (state[x][y].piece == null || state[x][y].piece.type == ChessPiece.EMPTY) {
+                    line += "\t|";
+                } else {
+                    line += state[x][y].piece.type.toString().substring(0, 4) + "\t|";
+                }
+                if (y != state[x].length - 1)
+                    border += "|=======";
+            }
+            border += "|";
+            System.out.println(line.substring(0, line.length() - 1) + "|");
+            if (x != state.length - 1)
+                System.out.println(border);
+            else
+                System.out.println("=================================================================");
+
         }
     }
 

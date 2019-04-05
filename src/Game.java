@@ -28,6 +28,7 @@ class Game extends JPanel {
 
   BufferedImage ui;
   Game gameManager;
+  AI cpu;
 
   // CONSTRUCTOR
   public Game() {
@@ -35,7 +36,7 @@ class Game extends JPanel {
     startGame();
     gameListener();
     gameManager = this;
-    AI cpu = new AI(this);
+    cpu = new AI(this);
   }
 
   public void startGame() {
@@ -338,6 +339,8 @@ class Game extends JPanel {
 
                 // IF AI Enabled
                 // Move move = ai.miniMax(turn == 0, 3, board);
+                Square[][] tmp = cpu.maxFun(board, 0, 5).first;
+                Util.updateUI(tmp, gameManager);
               }
 
               valid = false;

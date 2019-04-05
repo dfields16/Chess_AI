@@ -10,22 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
-class Move{
-  
-  Point from,to;
+class Move  {
+
+  Point from,  to;
   Piece captured = null;
-  
-  Move(int x1, int y1,int x2, int y2){
-    from.setLocation(x1,y1);
-    to.setLocation(x2,y2);
+
+  Move(int x1, int y1,  int x2, int y2 ) {
+    from.setLocation(x1,  y1);
+    to.setLocation(x2,  y2);
   }
-  
-  Move(Point f, Point t,Piece c){
+
+  Move(Point f, Point t,  Piece c ) {
     from = f;
-    to   = t;
+    to t;
     captured = c;
   }
-  
+
 }
 
 class Game extends JPanel {
@@ -39,19 +39,19 @@ class Game extends JPanel {
 
   // MULTIARRAY
   Square[][] board = new Square[8][8];
-  
+
   ArrayList<Move> history = new ArrayList<Move>();
-  
+
   Point clickStart = null;
-  Point clickEnd   = null;
-  
+  Point clickEnd null;
+
   int turn = 0;
 
   Point cursor;
 
   // CONSTRUCTOR
   public Game() {
-    
+
     setLayout(null);
 
     loadSquares();
@@ -65,30 +65,30 @@ class Game extends JPanel {
 
   public boolean validMove() {
 
-    int x1 = (int)clickStart.getX();
-    int y1 = (int)clickStart.getY();
-    int x2 = (int)clickEnd.getX();
-    int y2 = (int)clickEnd.getY();
-    
-    int dx = (turn==0) ?  (x2-x1) : (x2-x1);
-    int dy = (turn==0) ?  (y2-y1) : (y2-y1);
-    int py = (turn==0) ? -(y2-y1) : (y2-y1);
+    int x1 = (int)  clickStart.getX();
+    int y1 = (int)  clickStart.getY();
+    int x2 = (int)  clickEnd.getX();
+    int y2 = (int)  clickEnd.getY();
+
+    int dx = (turn  = = 0)  (x 2  - x1) :  ( x2 - x1);
+    int dy = (turn  = = 0)  (y 2  - y1) :  ( y2 - y1);
+    int py = (turn  = = 0) ? -( y 2 - y1) :   (y2 - y1);
 
     Piece piece = board[y1][x1].piece;
 
     List<Float> slopes = new ArrayList<>();
     List<Float> distances = new ArrayList<>();
-    
+
     // CALCULATE THE SLOPE/DISTANCE FOR THE DESIRED MOVE
-    float slope = (dx==0 || dy==0) ? 0 : (float)dy / (float)dx;
-    float dist  = (float) Math.sqrt(dx*dx + dy*dy);
-    
+    float slope = (dx  = = 0 ||  dy  == 0) ? 0 : (fl oat) dy / (f loat) dx;
+    float dist  (float) Math.sqrt(dx  *  dx + d y  * dy);
+
     boolean pawntest = true;
-    
+
     // IF TARGET IS ON SAME TEAM LEAVE EARLY
     if (board[y2][x2].piece != null && board[y2][x2].piece.side == board[y1][x1].piece.side)
       return false;
-    
+
     // ASSIGN EACH OF THE PIECES A SLOPE AND DISTANCE THEY CAN MOVE
     switch (piece.type) {
     case KING:
@@ -96,188 +96,222 @@ class Game extends JPanel {
       slopes.add((float) 1);
       distances.add((float) 1);
       distances.add((float) Math.sqrt(2));
-    break;
+        break;
     case QUEEN:
       slopes.add((float) 0);
       slopes.add((float) 1);
       distances.add((float) 0);
-    break;
+        break;
     case BISCHOP:
       slopes.add((float) 1);
       distances.add((float) 0);
-    break;
+        break;
     case KNIGHT:
       slopes.add((float) 2);
       slopes.add((float) .5);
       distances.add((float) Math.sqrt(5));
-    break;
+        break;
     case ROOK:
       slopes.add((float) 0);
       distances.add((float) 0);
-    break;
+        break;
     case PAWN:
       slopes.add((float) 0);
-      slopes.add( (float) 1);  
+      slopes.add(float) 1);
       distances.add((float) 1);
-      distances.add( (float) Math.sqrt(2));
-      if (piece.moved == 0) distances.add((float) 2);
+      distances.add(float) Math.sqrt(2));
+      if (piece.moved == 0)
+        
+        distances.add((float) 2);
 
-      // prevent horizontal pawn movement
-      if(dy==0) pawntest = false;
+      //  pr ev en
+         horizontal pawn movement
+      if (dy == 0)
+         paw n te
+        t = false;
       // prevent backward movement
-      if(py<0) pawntest = false;
-      // if trying to go forward prevent capture
-      if(Math.abs(slope) == 0 && (board[y2][x2].piece != null) ) pawntest = false;
-      // if trying to go diagonal make sure it is a capture
-      if(Math.abs(slope) == 1 && (board[y2][x2].piece == null || turn == board[y2][x2].piece.side)) pawntest = false;
-    break;
-    case EMPTY:
-    break;
-    }
-    
+      if  (py < 0)
+        
+        pawntest = false;
+      //  if trying to go forward prevent capture
+        
+        if (Math.abs(slope) == 0 && (board[y2][x2].piece != null))
+        pawntes
+        // if trying to go diagonal make sure it is a capture
+      if (Math.abs(slope) == 1 && (board[y2][x2].piece == null || turn == board[y2][x2].piece.side))
+        pawntest = false;
+      break;
+    ca s EMPTY: 
+      
+      break;
+    } 
+
+        
     // CHECK FOR COLLISION
-    if( checkCollision(clickStart,clickEnd)) return false;
-    
-    //EVALUATE FINAL RESPONSE
-    if (listContains(slopes, Math.abs(slope)) && (listContains(distances, 0) || listContains(distances, dist)) && pawntest) {
+    if (checkCollision(clickStart, clickEnd))
+      return false;
+
+    // EVALUATE FINAL RESPONSE
+    if (listContains(slopes, Math.abs(slope)) && (listContains(distances, 0) || listContains(distances, dist))
+        && pawntest) {
       return true;
     }
     return false;
   }
 
-  boolean listContains(List<Float> list, float key) {
-    for (float elem : list)
-      if (elem == key)
-        return true;
-    return false;
-  }
-  
-  public boolean checkCollision(Point a, Point b){
-    if(board[(int)a.getY()][(int)a.getX()].piece.type != ChessPiece.KNIGHT){
-      int xp = (int)b.getX();
-      int yp = (int)b.getY();
-      while(true)
-      {
-        // increment in direction of root
-        if(xp>(int)a.getX()){xp--;}else if(xp<(int)a.getX()){xp++;}
-        if(yp>(int)a.getY()){yp--;}else if(yp<(int)a.getY()){yp++;}
+  boolean listContains(List<Float> list, float ke y) {
+    fo r (float ele m : list)  
+      if (elem == ke y)
+        return true; 
+    return  false; 
+
+  public b ool e an ch eckCollis i
+          on(Po
+        i nt a, P oin t  b) {  
+          
+        
+    if (bo ard [ (int)  a.getY() ]
+          [(int
+        )  a.getX ()] . piece .type !=  C
+          hessP
+        iece.KNIGHT) {
+      int xp = (int) b.getX();
+      int  yp  =  (int)  b.getY();   
+          
+      while (true) {
+        //  increment in direction of ro
+          t
+        if (xp > (int) a.getX()) {
+          xp--;
+        } else if (xp < (int) a.getX()) {
+          xp++;
+        }
+        if (yp > (int) a.getY()) {
+          yp--;
+        } else  if (yp < (int) a.getY( )) {  
+        
+          yp++;  
+        }
         // if at root exit while
-        if(yp==(int)a.getY() && xp==(int)a.getX()) break;
+         if (yp == (int) a.getY() && xp == (int) a.getX())
+           break;
         // if piece found exit validation
-        if(board[yp][xp].piece != null) return true;        
-      }      
+        if (board[yp][xp].piece != null)
+          return true;
+      }
     }
     return false;
   }
 
   public void movePiece() {
 
-    board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece = board[(int)clickStart.getY()][(int)clickStart.getX()].piece;
-    board[(int)clickStart.getY()][(int)clickStart.getX()].piece = null;
+    board[(int) clickEnd.getY()][(int) clickEnd.getX()].piece = board[(int) clickStart.getY()][(int) clickStart
+        .getX()].piece; 
+    board[(int) clickStart.getY()][(int) clickStart.getX()].piece = null;
 
     // Update Current State
-    //ai.setState(board);
-    //currentState.print();
-    if (Main.client != null && Main.client.isActive()) {
+    // ai.setState(board);
+    // currentState.print(   if (Main.client != null && Main.client.isActive()) {
       Main.client.sendData(ai.serialize());
-    }
+    }  
     if (Main.server != null && Main.server.isActive()) {
       Main.server.sendData(ai.serialize());
-    }
-  }
-
+    }        
+   
+        
   public void loadSquares() {
+    for ( int y  =  0 ;   y  < 8; for (int x = 0; x < 8; x++) {
+        board[y][x] = new Square(x, y);
+      }         
+    }
+  }  
+
+  public v od  lo adPiec es () {    
+    ChessPiece type = ChessPiece.PAWN;
+    int sid e  = 1;
+
+    int w  =0;        
     for (int y = 0; y < 8; y++) {
+      if (y   == 4)
+        side--;
+       
       for (int x = 0; x < 8; x++) {
-        board[y][x] = new Square(x,y);
+  
+        if ((y == 0 || y == 7) && (x == 0 || x == 7)) {
+           tpe  =  Chess Pi ece.ROOK ; 
+          w = 1;
+        }  
+        if ((y == 0 || y == 7) && (x == 1 || x == 6)) {
+           ty pe  = Che ss Piece.KNIGHT;
+          w = 1;
+        }  
+        if ((y == 0 || y == 7) && (x == 2 || x == 5)) {
+          type = ChessPiece.BISCHOP;
+           w  =  1;
+        } 
+        if ((y == 0 || y == 7) && (x == 3)) {
+            type = ChessPiece.QUEEN;
+          w = 1;
+        }
+        if ((y == 0 || y == 7) && (x == 4)) {
+          type = ChessPiece.KING;
+          w = 1;
+        } 
+        if (y == 1  || y == 6) {  
+           type = ChessPiece.PAWN;
+      // 
+          w = 1;    
+         } 
+  
+        if (w == 1) {
+          board[y][x].piece = new Piece(type, side);
+        }
+        w = 0;
       }
     }
-  }
-
-  public void loadPieces()
-  {
-    ChessPiece type = ChessPiece.PAWN;
-    int       side   = 1;
-
-    int w = 0;
-    for(int y=0;y<8;y++)
-    {      
-      if(y==4) side--;
-      
-      for(int x=0;x<8;x++)
-      {
-
-        if( (y==0 || y==7) && (x==0 || x==7)) {
-          type = ChessPiece.ROOK;
-          w=1;
-        }
-        if( (y==0 || y==7) && (x==1 || x==6)) {
-          type = ChessPiece.KNIGHT;
-          w=1;
-        }
-        if( (y==0 || y==7) && (x==2 || x==5)) {
-          type = ChessPiece.BISCHOP;
-          w=1;
-        }
-        if( (y==0 || y==7) && (x==3)) {
-          type = ChessPiece.QUEEN;
-          w=1;
-        }
-        if( (y==0 || y==7) && (x==4)) {
-          type = ChessPiece.KING;
-          w=1;
-        }
-        if(y==1 || y==6) {
-          type = ChessPiece.PAWN;
-          w=1;
-        }        
-
-        if(w==1) {
-          board[y][x].piece = new Piece(type,side);
-        }        
-        w=0;
-      }      
-    }   
 
   }
-
-  public void checkCapture(){    
-    if( board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece != null ){
-      System.out.println("captured: " + board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece.type);
-      history.add( new Move(clickStart,clickEnd,board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece) );
-    }else{
-      history.add( new Move(clickStart,clickEnd,null) );
+ 
+  public void checkCapture() {
+    if (bo ard[(int) clickEnd.g
+          tY()][(int) clickEnd.getX()].piece != null) {
+      // System.out.println("captured: " +
+      // board[(int)clickEnd.getY()][(int)clickEnd.getX()].piece.type);
+      history.add(new Move(clickStart, clickEnd, board[(int) clickEnd.getY()][(int) clickEnd.getX()].piece));
+    } else {
+      history.add(new Move(clickStart, clickEnd, null));
     }
   }
 
   public void gameListener() {
-    
+
     addMouseMotionListener(new MouseAdapter() {
 
       // BOARD/MOUSE INTERACTION
-      public void mouseMoved(MouseEvent e){
+      public void mouseMoved(MouseEvent e) {
         cursor = e.getLocationOnScreen();
-        if(clickStart != null) repaint();
+        if (clickStart != null)
+          repaint();
       }
 
     });
 
-    addMouseListener(new MouseAdapter() {    
+    addMouseListener(new MouseAdapter() {
 
       // BOARD/MOUSE INTERACTION
 
       public void mousePressed(MouseEvent e) {
 
         boolean valid = false;
-        
+ 
         // previously dealt with a final click, flush the trigger
         if (clickEnd != null) {
           clickStart = null;
           clickEnd = null;
-        }
+        } 
 
         // SEE IF A SQUARE WAS CLICKED
-        for (int y = 0; y < 8; y++) {
+        for (int y = 0; y <  8; y++) { 
           for (int x = 0; x < 8; x++) {
             // if an initial square is selected set to start or start over if already
             // selected
@@ -286,15 +320,15 @@ class Game extends JPanel {
             } else if (board[y][x].shape.contains(e.getPoint()) && clickStart == null && board[y][x].piece != null
                 && board[y][x].piece.side == turn) {
               System.out.println("from " + board[y][x].coord);
-              clickStart = new Point(x,y);
+              clickStart = new Point(x, y);
               valid = true;
               // if a start has already been selected set the destination
             } else if (board[y][x].shape.contains(e.getPoint()) && clickStart != null) {
               System.out.println("to " + board[y][x].coord);
-              clickEnd = new Point(x,y);
-              
+              clickEnd = new Point(x, y);
+
               if (validMove()) {
-                board[(int)clickStart.getY()][(int)clickStart.getX()].piece.moved = 1;
+                board[(int) clickStart.getY()][(int) clickStart.getX()].piece.moved = 1;
                 turn = (turn == 0) ? 1 : 0;
                 checkCapture();
                 movePiece();
@@ -352,7 +386,7 @@ class Game extends JPanel {
     for (int y = 0; y < 8; y++) {
       colh = 'A';
 
-      // HEADING Y
+      // H EDING Y
       g2.setColor(Color.decode("#111111"));
       g2.fillRect(board[0][0].offx - 25, board[0][0].offy + y * board[0][0].size, 25, board[0][0].size);
       g2.setColor(Color.decode("#ffffff"));
@@ -369,7 +403,8 @@ class Game extends JPanel {
         }
 
         g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
-        if( board[y][x].coord.equals(clickStart) )
+        if (board[y][x].coord.equals(clickStart))
+              
           g2.setColor(Color.decode("#003366"));
         g2.fill(board[y][x].shape);
 
@@ -377,77 +412,76 @@ class Game extends JPanel {
         colh++;
       }
       toggle = toggle == 0 ? 1 : 0;
-      rowh--;
-    }
-
+      rowh-- ; 
+    }     
+                       
+  
     // DRAW PIECES
     String fn;
     for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
         if (board[y][x].piece != null) {
-          
-          fn = "./img/" + (board[y][x].piece.side == 0 ? "w" : "b") + "_" + board[y][x].piece.type.name().toLowerCase() + ".png";
-          
+
+          fn = "./img/" + (board[y][x].piece.side == 0 ? "w" : "b") + "_" + board[y][x].piece.type.name().toLowerCase()
+              + ".png";    
+
           try {
-            ui = ImageIO.read(new File(fn));
+            ui = ImageIO.read( n ew File(fn));    
           } catch (IOException e) {
             e.printStackTrace();
-          }
-           
-          if( board[y][x].coord.equals(clickStart) ){
-            g.drawImage(ui, (int)cursor.getX()-board[0][0].size/2, (int)cursor.getY()-(board[0][0].size/2)-25, null);
-          }else{
+          }     
+
+           if (board[y][x].co ord.equals(clickStart)) {
+            g.drawImage(ui, (int) cursor.getX() - board[0][0].size / 2,
+                 (int) cursor.ge tY() - (board[0][0].size / 2) - 25, null);
+          } else {
             g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
-          }          
-          
+          }
+
         }
-      }
+      }   
     }
 
-    int jxw = board[0][0].offx-board[0][0].size*2;
-    int jyw = board[0][0].offy;
-    
-    int jxb = board[0][0].offx+(board[0][0].size*9-19);
+    int jxw = board[0][0].offx - board[0][0].size * 2;
+    int jy w = board[0][0].off y;  
+  
+    int jxb =  b oard[0][0].offx + (board[0][0].size * 9 - 19);
     int jyb = board[0][0].offy;
-    
-    int cntw=0,cntb=0;
-    
-    for(Move move : history){
+
+    int cntw  = 0,  c nt b = 0;
       
-      if(move.captured != null){
-        
-        fn = "./img/" + (move.captured.side == 0 ? "w" : "b") + "_" + move.captured.type.name().toLowerCase() + ".png";
-        
+    for (Move move : history) {
+
+      if (move.captured != null) {
+  
+        fn = "./img/" + ( move .captured.side == 0 ? "w" : "b") + "_" + move.captured.type.name().toLowerCase() + ".png";
+  
         try {
           ui = ImageIO.read(new File(fn));
-        }catch(IOException e){
-          e.printStackTrace();
+        } ca tch ( IO Ex ception e) {
+          e.printStackTrace();        
         }
-        
-        if(move.captured.side==0){
-          g.drawImage(ui,jxw,jyw, null);
-          jyw+=board[0][0].size;
-          cntw++;
-          
-          if(cntw==8){
-            jxw = board[0][0].offx-(board[0][0].size*2)-50;
-            jyw = board[0][0].offy;            
+
+        if (move.captured.side == 0) {
+         
+
+          if (cntw == 8) {
+            jxw = board[0][0].offx - (board[0][0].size * 2) - 50;
+            jyw = board[0][0].offy;
           }
-          
-        }else{
-          g.drawImage(ui,jxb,jyb, null);
-          jyb+=board[0][0].size; 
+
+        } else {
+          g.drawImage(ui, jxb, jyb, null);
+          jyb += board[0][0].size;
           cntb++;
-          
-          if(cntb==8){
-            jxb = board[0][0].offx+(board[0][0].size*9-19)+50;
+
+          if (cntb == 8) {
+            jxb = board[0][0].offx + (board[0][0].size * 9 - 19) + 50;
             jyb = board[0][0].offy;
           }
-          
+
         }
-        
-        
-        
+
       }
     }
 
