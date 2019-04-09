@@ -1,72 +1,78 @@
-import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 public class AI {
 
-    // public Square[][] state;
-    private Game game;
+    Square[][] state = new Square[8][8];
+    int side;
 
-    public AI() {
+    public AI(){}
+
+    public Move getMove(Square[][] b, int d, int s) {
+      state = b;
+      side  = s;
+      //return maxFun(state,0,d);
+      return tmpMove();
     }
-
-    public AI(Game g) {
-        game = g;
-    }
-
-    public Pair maxFun(Square[][] board, int depth, int maxDepth) {
-        Util.print(board);
-        Pair p = new Pair(board, 0);
-        if (depth >= maxDepth) {
-            p.second = heuristic(board);
-        } else {
-            ArrayList<Move> potentialM = potentialMoves(board, 1);
-            int topScore = -1000000;
-            int topBoardNo = 0;
-            for (int i = 0; i < potentialM.size(); i++) {
-                Square[][] curr = Util.movePiece(board, potentialM.get(i));
-
-                Pair pair = minFun(curr, depth + 1, maxDepth);
-                if (pair.second > topScore) {
-                    topBoardNo = i;
-                    topScore = pair.second;
-                    p = pair;
+    
+    public Move tmpMove(){
+      
+      Random rand = new Random();
+      int pc = 0;
+      int mc = 0;
+      
+      Move move;
+      Move fb = null;
+      
+      for (int y1 = 0; y1 < state.length; y1++) {
+        for (int x1 = 0; x1 < state[y1].length; x1++) {
+          
+          // FIND A PIECE ON MY SIDE
+          if(state[y1][x1].piece != null && state[y1][x1].piece.side == side) {
+            
+            pc++;
+            
+            System.out.println("piece: " + state[y1][x1].piece.type + " " + state[y1][x1].piece.side);
+            
+            if(rand.nextInt(2) > 0 | pc>10){
+              //FIND A SPACE IT CAN MOVE
+              for (int y2 = 0; y2 < state.length; y2++) {
+                for (int x2 = 0; x2 < state[y2].length; x2++) {
+                  
+                  move = new Move(x1,y1,x2,y2);
+                  fb   = new Move(x1,y1,x2,y2);
+                  
+                  //IF WE HAVE A VALID MOVE BLINDLY RETURN IT
+                  if(Util.validMove(state, move, side)) {
+                    
+                    mc++;
+                    
+                    if(rand.nextInt(2) > 0 | mc>2) {
+                      return new Move(x1,y1,x2,y2);
+                    }
+                  }
+                  
                 }
+              }
+              
             }
+          }
+          
         }
-
-        return p;
+      }
+      
+      return fb;
+        
     }
 
-    public Pair minFun(Square[][] board, int depth, int maxDepth) {
-        Util.print(board);
-        Pair p = new Pair(board, 0);
-        if (depth >= maxDepth) {
-            p.second = heuristic(board);
-        } else {
-            ArrayList<Move> potentialM = potentialMoves(board, 0);
-            int lowScore = 1000000;
-            int topBoardNo = 0;
-            for (int i = 0; i < potentialM.size(); i++) {
-                Square[][] curr = Util.movePiece(board, potentialM.get(i));
-                // if (Util.inCheck(curr, 0)) continue;
-                Pair pair = maxFun(curr, depth + 1, maxDepth);
-                if (pair.second < lowScore) {
-                    topBoardNo = i;
-                    lowScore = pair.second;
-                    p = pair;
-                }
-            }
-
-        }
-
-        return p;
+    public Move maxFun(Square[][] board, int depth, int maxDepth) {      
+      Move move = null;
+      return move;
     }
 
-    public Square[][] MiniMax(Square[][] squares, int turn, int currDepth, int maxDepth) {
-
-        return null;
+    public Move minFun(Square[][] board, int depth, int maxDepth) {      
+      Move move = null;
+      return move;
     }
 
     public void setState(Square[][] squares) {
@@ -74,96 +80,9 @@ public class AI {
         // state = squares;
     }
 
-    public ArrayList<Move> potentialMoves(Square[][] presentState, int side) {
-        ArrayList<Move> foundMoves = new ArrayList<Move>();
-
-        for (int y = 0; y < 8; y++) {
-            for (int x = 0; x < 8; x++) {
-                if (presentState[y][x].piece != null && presentState[y][x].piece.side == side) {
-                    for (int y2 = 0; y2 < 8; y2++) {
-                        for (int x2 = 0; x2 < 8; x2++) {
-                            if (presentState[y2][x2].piece != null && presentState[y][x].piece.side == side) {
-                                Move testMove = new Move(new Point(x, y), new Point(x2, y2));
-                                if (Util.validMove(presentState, testMove, side)) {
-                                    foundMoves.add(testMove);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return foundMoves;
-    }
-
-    public int miniMax(boolean Max, int depth, Square[][] state) {
-        // int tempSide = (Max == true) ? 1 : 0;
-        ArrayList<Move> allMoves;
-
-        if (depth == 0) {
-            return heuristic(state);
-            // return bestMove(state, true);
-        } else if (Max) {
-            int maxVal = 99999;
-            allMoves = potentialMoves(state, 1);
-
-            for (int i = 0; i < allMoves.size(); i++) {
-                state = Util.movePiece(state, allMoves.get(i));
-                maxVal = Math.max(maxVal, miniMax(!Max, depth - 1, state));
-                Util.undoMove(state);
-            }
-            return maxVal;
-        } else {
-            int minVal = -99999;
-            allMoves = potentialMoves(state, 0);
-
-            for (int i = 0; i < allMoves.size(); i++) {
-                state = Util.movePiece(state, allMoves.get(i));
-                minVal = Math.min(minVal, miniMax(Max, depth - 1, state));
-                Util.undoMove(state);
-            }
-            return minVal;
-        }
-    }
-
     public Move bestMove(ArrayList<Move> moves, boolean bestWorst) {
-        // bestWorst : true is best, false is worst
-        ArrayList<Move> findMoves = new ArrayList<Move>();
-        for (int i = 0; i < moves.size(); i++) {
-            if (Util.checkCapture(game.board, moves.get(i))) {
-                findMoves.add(moves.get(i));
-            }
-        }
-        int best = -9999;
-        int worst = 9999;
-        Move returnMove = new Move();
-        for (int j = 0; j < findMoves.size(); j++) {
-            if (!bestWorst && game.board[findMoves.get(j).y1()][findMoves.get(j).x1()].piece != null) {
-                if (game.board[findMoves.get(j).y1()][findMoves.get(j).x1()].piece.type.value > best) {
-                    // return highest value
-                    // best = board[findMoves.get(j).y1()][findMoves.get(j).x1()].piece.type.value;
-                    best = heuristic(game.board);
-                    returnMove = findMoves.get(j);
-                } else if (game.board[findMoves.get(j).y1()][findMoves.get(j).x1()].piece.type.value < worst) {
-                    // return lowest value
-                    worst = -1 * heuristic(game.board);
-                    returnMove = findMoves.get(j);
-                }
-            }
-        }
-        if (best == -9999 && bestWorst) { // assign randomly if a capture can't happen
-
-            Random chooseMove = new Random();
-            int i = chooseMove.nextInt(findMoves.size());
-            returnMove = findMoves.get(i);
-        } else if (worst == 9999 && !bestWorst) {
-            Random chooseMove = new Random();
-            int i = chooseMove.nextInt(findMoves.size());
-            returnMove = findMoves.get(i);
-        }
-
-        return returnMove;
+      Move move = null;
+      return move;
     }
 
     private int heuristic(Square[][] board) {
@@ -172,10 +91,13 @@ public class AI {
             for (int x = 0; x < board[y].length; x++) {
                 if (board[y][x].piece == null)
                     continue;
-                if (board[y][x].piece.side == game.turn) {
-                    val += board[y][x].piece.type.value;
+                
+                int mod = 1;
+                if(x > 1 && x < 6 && y > 1 && y < 6)mod = 2;
+                if (board[y][x].piece.side == side) {
+                    val += board[y][x].piece.type.value*2;
                 } else {
-                    val -= board[y][x].piece.type.value;
+                    val -= board[y][x].piece.type.value*2;
                 }
             }
         }

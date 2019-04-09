@@ -9,8 +9,8 @@ class Move{
   Move(){}
   
   Move(int x1, int y1,int x2, int y2){
-    start.setLocation(x1,y1);
-    end.setLocation(x2,y2);
+    start = new Point(x1,y1);
+    end   = new Point(x2,y2);
   }
   
   Move(Point f, Point t){
