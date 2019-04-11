@@ -182,10 +182,8 @@ public class Util {
 
     if (checkCapture(board, move)) {
       board.history.add(new Move(move.start, move.end,board.piece(move.x2(),move.y2())));
-      System.out.println("captured");
     } else {
       board.history.add(new Move(move.start, move.end,null));
-      System.out.println("not captured");
     }
 
   }
