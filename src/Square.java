@@ -10,12 +10,18 @@ class Square {
 
   Point coord = new Point();
   Shape shape;
-  
+
   Piece piece = null;
-  
-  public Square(int c, int r) {
+
+  public Square(int c, int r){
     coord.setLocation(c,r);
     shape = new Rectangle.Double((offx + c * size), (offy + r * size), size, size);
+  }
+
+  public Square(Square s){
+    coord = new Point(s.coord);
+    shape = new Rectangle.Double((s.offx + s.coord.y * size), (s.offy + s.coord.x * size), s.size, s.size);
+    piece = (s.piece==null) ? null : new Piece(s.piece);
   }
 
 }

@@ -8,8 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
@@ -18,13 +16,9 @@ class Game extends JPanel {
   
   Client client = new Client();
 
-  Square[][] board;
-  ArrayList<Move> history;
-
+  Board  board;
   Point cursor;
-  Move click;
-  
-  Response response;
+  Move   click;
 
   BufferedImage ui;
 
@@ -34,14 +28,9 @@ class Game extends JPanel {
     gameListener();
   }
 
-  ///////////////////////////////////////////////////////////////////////////////
-  // MEMBERS
-  ///////////////////////////////////////////////////////////////////////////////
-
   public void startGame(){
     click   = new Move();
     board   = client.getBoard();
-    history = new ArrayList<Move>();
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -69,28 +58,25 @@ class Game extends JPanel {
 
         // previously dealt with a final click, flush the trigger
         if (click.end != null) click.clear();
-        
+
         // SEE IF A SQUARE WAS CLICKED
         for (int y = 0; y < 8; y++){
           for (int x = 0; x < 8; x++){
             // if an initial square is selected set to start or start over if already
             // selected
-            if (board[y][x].shape.contains(e.getPoint()) && click.start == board[y][x].coord){
+            if( board.shape(x,y).contains(e.getPoint()) && click.start == board.coord(x,y)){
               // do nothing because validator below will catch it
-            } else if (board[y][x].shape.contains(e.getPoint()) && click.start == null && board[y][x].piece != null && board[y][x].piece.side == client.turn && board[y][x].piece.side == client.side){
+            }else if (board.in(x,y,e.getPoint()) && click.start == null && board.piece(x,y) != null && 
+                      board.piece(x,y).side == board.turn && board.piece(x,y).side == client.side)
+            {
               click.start = new Point(x, y);
               valid = true;
               // if a start has already been selected set the destination
-            } else if (board[y][x].shape.contains(e.getPoint()) && click.start != null){
+            }else if( board.in(x,y,e.getPoint()) && click.start != null){
               click.end = new Point(x, y);
-              
-              response  = client.sendMove(board,click);
 
-              if ( response.valid ) {
-                board = response.board;
-                client.turn  = response.turn;
-                System.out.println(client.turn);
-              }
+              board  = client.sendMove(board,click);
+              System.out.println(board.turn);
 
               valid = false;
             }
@@ -134,19 +120,19 @@ class Game extends JPanel {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    g.drawImage(ui, board[0][0].offx - 24, board[0][0].offy - 24, null);
+    g.drawImage(ui, board.offx(0,0) - 24, board.offy(0,0) - 24, null);
 
     // DRAW TURN INDICATOR
-    g2.setColor((client.turn == 0) ? Color.decode("#ffffff") : Color.decode("#000000"));
-    g2.fillRect(board[0][0].offx - 25, board[0][0].offy - 25, 25, 25);
+    g2.setColor((board.turn == 0) ? Color.decode("#ffffff") : Color.decode("#000000"));
+    g2.fillRect(board.offx(0,0) - 25, board.offy(0,0) - 25, 25, 25);
 
     // DRAW TIMER
-    g2.setColor((client.turn == 0) ? Color.decode("#ffffff") : Color.decode("#000000"));
-    g2.fillRect(board[0][0].offx + board[0][0].size * 6, board[0][0].offy - 60, board[0][0].size * 2, 25);
-    g2.setColor((client.turn == 0) ? Color.decode("#000000") : Color.decode("#ffffff"));
+    g2.setColor((board.turn == 0) ? Color.decode("#ffffff") : Color.decode("#000000"));
+    g2.fillRect(board.offx(0,0) + board.size(0,0) * 6, board.offy(0,0) - 60, board.size(0,0) * 2, 25);
+    g2.setColor((board.turn == 0) ? Color.decode("#000000") : Color.decode("#ffffff"));
     String timedis = String.valueOf("Time: ") + String.format("%02d", 0) + " of " + String.format("%02d", 60);
     g.setFont(new Font("default", Font.BOLD, 16));
-    g2.drawString(timedis, board[0][0].offx + 15 + board[0][0].size * 6, board[0][0].offy - 42);
+    g2.drawString(timedis, board.offx(0,0) + 15 + board.size(0,0) * 6, board.offy(0,0) - 42);
 
     // DRAW BOARD
     int toggle = 0;
@@ -158,27 +144,27 @@ class Game extends JPanel {
 
       // HEADING Y
       g2.setColor(Color.decode("#111111"));
-      g2.fillRect(board[0][0].offx - 25, board[0][0].offy + y * board[0][0].size, 25, board[0][0].size);
+      g2.fillRect(board.offx(0,0) - 25, board.offy(0,0) + y * board.size(0,0), 25, board.size(0,0));
       g2.setColor(Color.decode("#ffffff"));
-      g2.drawString(String.valueOf(rowh), board[0][0].offx - 16, board[0][0].offy + 48 + (y * board[0][0].size));
+      g2.drawString(String.valueOf(rowh), board.offx(0,0) - 16, board.offy(0,0) + 48 + (y * board.size(0,0)));
 
       for (int x = 0; x < 8; x++) {
 
         if (y == 0) {
           // HEADING X
           g2.setColor(Color.decode("#111111"));
-          g2.fillRect(board[0][0].offx + x * board[0][0].size, board[0][0].offy - 25, board[0][0].size, 25);
+          g2.fillRect(board.offx(0,0) + x * board.size(0,0), board.offy(0,0) - 25, board.size(0,0), 25);
           g2.setColor(Color.decode("#ffffff"));
-          g2.drawString(String.valueOf(colh), board[0][0].offx + 34 + (x * board[0][0].size), board[0][0].offy - 8);
+          g2.drawString(String.valueOf(colh), board.offx(0,0) + 34 + (x * board.size(0,0)), board.offy(0,0) - 8);
         }
 
         g2.setColor(toggle == 1 ? Color.BLACK : Color.white);
         // g2.setColor(toggle == 1 ? Color.decode("#603f2f") : Color.decode("#dfa070")
         // );
 
-        if (board[y][x].coord.equals(click.start))
+        if (board.coord(x,y).equals(click.start))
           g2.setColor(Color.decode("#003366"));
-        g2.fill(board[y][x].shape);
+        g2.fill(board.shape(x,y));
 
         toggle = toggle == 0 ? 1 : 0;
         colh++;
@@ -193,16 +179,16 @@ class Game extends JPanel {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    g.drawImage(ui, board[0][0].offx, board[0][0].offy, null);
+    g.drawImage(ui, board.offx(0,0), board.offy(0,0), null);
 
     // DRAW PIECES
     String fn;
     for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
-        if (board[y][x].piece != null) {
+        if (board.piece(x,y) != null) {
 
-          fn = "./img/" + pack + "/" + board[y][x].size + "/" + (board[y][x].piece.side == 0 ? "W" : "B") + "_"
-              + board[y][x].piece.type.name() + ".png";
+          fn = "./img/" + pack + "/" + board.size(x,y) + "/" + (board.piece(x,y).side == 0 ? "W" : "B") + "_"
+              + board.piece(x,y).type.name() + ".png";
 
           try {
             ui = ImageIO.read(new File(fn));
@@ -210,11 +196,11 @@ class Game extends JPanel {
             e.printStackTrace();
           }
 
-          if (board[y][x].coord.equals(click.start)) {
-            g.drawImage(ui, (int) cursor.getX() - board[0][0].size / 2, (int) cursor.getY() - (board[0][0].size / 2),
+          if (board.coord(x,y).equals(click.start)) {
+            g.drawImage(ui, (int) cursor.getX() - board.size(0,0) / 2, (int) cursor.getY() - (board.size(0,0) / 2),
                 null);
           } else {
-            g.drawImage(ui, board[y][x].shape.getBounds().x, board[y][x].shape.getBounds().y, null);
+            g.drawImage(ui, board.shape(x,y).getBounds().x, board.shape(x,y).getBounds().y, null);
           }
 
         }
@@ -222,19 +208,19 @@ class Game extends JPanel {
     }
 
     // DRAW THE JAILYARD
-    int jxw = board[0][0].offx - board[0][0].size * 2;
-    int jyw = board[0][0].offy;
+    int jxw = board.offx(0,0) - board.size(0,0) * 2;
+    int jyw = board.offy(0,0);
 
-    int jxb = board[0][0].offx + (board[0][0].size * 9 - 19);
-    int jyb = board[0][0].offy;
+    int jxb = board.offx(0,0) + (board.size(0,0) * 9 - 19);
+    int jyb = board.offy(0,0);
 
     int cntw = 0, cntb = 0;
 
-    for (Move move : history) {
+    for (Move move : board.history) {
 
       if (move.captured != null) {
 
-        fn = "./img/" + pack + "/" + board[move.y1()][move.x1()].size + "/" + (move.captured.side == 0 ? "W" : "B")
+        fn = "./img/" + pack + "/" + board.size(move.x1(),move.y1()) + "/" + (move.captured.side == 0 ? "W" : "B")
             + "_" + move.captured.type.name() + ".png";
 
         try {
@@ -245,22 +231,22 @@ class Game extends JPanel {
 
         if (move.captured.side == 0) {
           g.drawImage(ui, jxw, jyw, null);
-          jyw += board[0][0].size;
+          jyw += board.size(0,0);
           cntw++;
 
           if (cntw == 8) {
-            jxw = board[0][0].offx - (board[0][0].size * 2) - 50;
-            jyw = board[0][0].offy;
+            jxw = board.offx(0,0) - (board.size(0,0) * 2) - 50;
+            jyw = board.offy(0,0);
           }
 
         } else {
           g.drawImage(ui, jxb, jyb, null);
-          jyb += board[0][0].size;
+          jyb += board.size(0,0);
           cntb++;
 
           if (cntb == 8) {
-            jxb = board[0][0].offx + (board[0][0].size * 9 - 19) + 50;
-            jyb = board[0][0].offy;
+            jxb = board.offx(0,0) + (board.size(0,0) * 9 - 19) + 50;
+            jyb = board.offy(0,0);
           }
 
         }

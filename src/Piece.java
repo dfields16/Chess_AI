@@ -14,14 +14,20 @@ class Piece {
   ChessPiece type;
 
   // FLAGS
-  int side;
-  int moved;
-  int checked;
+  int side    =-1;
+  int moved   = 0;
+  int checked = 0;
 
   public Piece(ChessPiece p, int c) {
-    // int i = ChessPiece.BISCHOP.value;
     type = p;
     side = c;
+  }
+  
+  public Piece(Piece p) {
+    type    = p.type; 
+    side    = p.side;
+    moved   = p.moved;
+    checked = p.checked;
   }
 
 }

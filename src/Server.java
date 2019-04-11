@@ -4,17 +4,13 @@ import java.util.TimerTask;
 
 public class Server {
 
-  Square[][] board = new Square[8][8];
+  Board board;
   AI cpu      = new AI();
-
-  int   turn  = 0;
-  int turnlen = 5;
-  int timer   = 0;
   
   boolean ai  = true;
   
   // WHO IS ON WHICH SIDE 0:ai 1:play 1 2: player 2
-  // WILL NEED TO TWEAK BASED ON UNIQUE CLIENT ID AI WILL STILL BE FIXED  
+  // WILL NEED TO TWEAK BASED ON UNIQUE CLIENT ID AI WILL STILL BE FIXED
   int wside   = 1;
   int bside   = 0;
 
@@ -29,14 +25,14 @@ public class Server {
     TimerTask task = new TimerTask() {
       @Override
       public void run() {
-        timer++;
-        if (timer > turnlen) {    
+        board.timer++;
+        if (board.timer > board.turnlen) {    
           // is AI playing or real person
-          turn = (turn == 0) ? 1 : 0; 
-          if((turn==0 && wside==0) || (turn==1 && bside==0)) {
+          board.turn = (board.turn == 0) ? 1 : 0; 
+          if((board.turn==0 && wside==0) || (board.turn==1 && bside==0)) {
             aiTurn();
           }
-          timer = 1;
+          board.timer = 1;
         }
       }
     };
@@ -44,55 +40,40 @@ public class Server {
 
   }
 
-  public Response makeMove(Square[][] board,Move click) {
-    
-    Response response = new Response();
+  public Board makeMove(Move move){
 
-    if( Util.movePiece(board, click, turn) ) {
+    if( Util.movePiece(board, move, board.turn) ) {
 
-      turn = (turn == 0) ? 1 : 0;
-      timer = 1;
+      board.turn = (board.turn == 0) ? 1 : 0;
+      board.timer = 1;
       
-      // IF PLAYING AI LET IT MOVE THEN SET RESPONSE OTHERWISE PUSH THE PLAYERS
-      // MOVE SO THE OTHER CLIENT WILL KNOW WHAT IT WAS
-      if((turn==0 && wside==0) || (turn==1 && bside==0)){        
-        response.move  = aiTurn();
-      }else {
-        response.move  = click;
+      if((board.turn==0 && wside==0) || (board.turn==1 && bside==0)){        
+        aiTurn();
       }
 
-      timer = 1;
-
-      response.valid = true;
-    }else {      
-      response.valid = false;
+      board.timer = 1;
+      board.valid = true;
     }
-    
-    response.turn  = turn;
-    response.board = board;
-    
-    return response;
+
+    return board;
   }
   
   public Move aiTurn() {
-    Move move = cpu.getMove(board,2,turn);
-    if(move != null) Util.movePiece(board, move, turn);
-    turn = (turn == 0) ? 1 : 0;
+    Move move = cpu.getMove(board,2,board.turn);
+    if(move != null) Util.movePiece(board, move,board.turn);
+    board.turn = (board.turn == 0) ? 1 : 0;
     return move;
   }
 
   public int getSide() {
     return 0;
   }
-  public Square[][] getBoard(){
+  public Board getBoard(){
     return board;
   }
   
   public void startGame(){
-    // RESET HISTORY
-    history = new ArrayList<Move>();
-    // SET UP THE BOARD
-    Util.loadSquares(board);
+    board = new Board(8,8);
     Util.resetPieces(board);
   }
 
