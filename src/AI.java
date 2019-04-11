@@ -51,16 +51,18 @@ public class AI {
           
           Board tmp = new Board(board);
           
-          //IF WE HAVE A VALID MOVE BLINDLY RETURN IT
+          //IF WE HAVE A VALID MOVE GO DOWN THE RABBIT HOLE
           if( Util.movePiece(tmp,move,side) ){
             
+            // GOING DEEPER OR GETTING A SCORE
             if(level<=depth){
               val = bestMove(tmp);
               level--;
             }else {
               val = heuristic(tmp);
             }
-
+            
+            // PROCESS THE SCORE AND MOVE
             if(val > score){
               score = val;
               best  = move;
