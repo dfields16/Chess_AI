@@ -11,11 +11,12 @@ public class AI {
     
     Move best;
 
-    public AI(){}
+    public AI(int skill){
+      depth = skill;
+    }
 
-    public Move getMove(Board b, int d, int s){
+    public Move getMove(Board b, int s){
 
-      depth = d;
       side  = s;
       best  = null;
       

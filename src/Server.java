@@ -5,7 +5,7 @@ import java.util.TimerTask;
 public class Server {
 
   Board board;
-  AI cpu      = new AI();
+  AI cpu      = new AI(2);
   
   boolean ai  = true;
   
@@ -59,7 +59,7 @@ public class Server {
   }
   
   public Move aiTurn() {
-    Move move = cpu.getMove(board,2,board.turn);
+    Move move = cpu.getMove(board,board.turn);
     if(move != null) Util.movePiece(board, move,board.turn);
     board.turn = (board.turn == 0) ? 1 : 0;
     return move;
