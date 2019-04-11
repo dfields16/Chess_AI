@@ -41,8 +41,6 @@ public class AI {
         // found one
         if( board.piece(x1,y1) != null && board.piece(x1,y1).side == side){
 
-          //System.out.println("processing my: " + board.piece(x1,y1).type);
-
         //FIND SPACES IT CAN MOVE
         for(int y2 = 0; y2 < board.len('y'); y2++){
         for(int x2 = 0; x2 < board.len('x'); x2++){
