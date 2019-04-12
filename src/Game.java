@@ -60,28 +60,30 @@ class Game extends JPanel {
         if (click.end != null) click.clear();
 
         // SEE IF A SQUARE WAS CLICKED
-        for (int y = 0; y < 8; y++){
-          for (int x = 0; x < 8; x++){
-            // if an initial square is selected set to start or start over if already
-            // selected
-            if( board.shape(x,y).contains(e.getPoint()) && click.start == board.coord(x,y)){
-              // do nothing because validator below will catch it
-            }else if (board.in(x,y,e.getPoint()) && click.start == null && board.piece(x,y) != null && 
-                      board.piece(x,y).side == board.turn && board.piece(x,y).side == client.side)
-            {
-              click.start = new Point(x, y);
-              valid = true;
-              // if a start has already been selected set the destination
-            }else if( board.in(x,y,e.getPoint()) && click.start != null){
-              click.end = new Point(x, y);
-
-              board  = client.sendMove(board,click);
-              System.out.println(board.turn);
-
-              valid = false;
-            }
-
+        for(int y = 0; y < 8; y++){
+        for(int x = 0; x < 8; x++){
+          
+          // if an initial square is selected set to start or start over if already selected
+          if( board.shape(x,y).contains(e.getPoint()) && click.start == board.coord(x,y)){
+            
+            // do nothing because validator below will catch it
+            
+          }else if (board.in(x,y,e.getPoint()) && click.start == null && board.piece(x,y) != null && board.piece(x,y).side == board.turn && board.piece(x,y).side == client.side)
+          {
+            
+            click.start = new Point(x, y);
+            valid = true;
+            
+            // if a start has already been selected set the destination
+          }else if( board.in(x,y,e.getPoint()) && click.start != null){
+            
+            click.end = new Point(x, y);
+            board  = client.sendMove(board,click);
+            valid = false;
+            
           }
+
+        }
         }
 
         // if something other than square was clicked

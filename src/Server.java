@@ -5,7 +5,7 @@ import java.util.TimerTask;
 public class Server {
 
   Board board;
-  AI cpu      = new AI(2);
+  AI cpu      = new AI(3);
   
   boolean ai  = true;
   

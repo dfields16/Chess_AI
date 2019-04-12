@@ -435,29 +435,4 @@ public class Util {
       return false;
   }
 
-
-  static public void print(Square[][] state) {
-      System.out.println("=================================================================");
-      for (int x = 0; x < state.length; x++) {
-          String line = "|";
-          String border = "|=======";
-          for (int y = 0; y < state[x].length; y++) {
-              if (state[x][y].piece == null || state[x][y].piece.type == ChessPiece.EMPTY) {
-                  line += "\t|";
-              } else {
-                  line += state[x][y].piece.side + state[x][y].piece.type.toString().substring(0, 4) + "\t|";
-              }
-              if (y != state[x].length - 1)
-                  border += "|=======";
-          }
-          border += "|";
-          System.out.println(line.substring(0, line.length() - 1) + "|");
-          if (x != state.length - 1)
-              System.out.println(border);
-          else
-              System.out.println("=================================================================");
-
-      }
-  }
-
 }

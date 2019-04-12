@@ -38,9 +38,9 @@ public class AI {
       for(int y1 = 0; y1 < board.len('y'); y1++){
       for(int x1 = 0; x1 < board.len('x'); x1++){
 
-        // found one
-        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == side){
         //FIND SPACES IT CAN MOVE
+        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == side){
+          
         for(int y2 = 0; y2 < board.len('y'); y2++){
         for(int x2 = 0; x2 < board.len('x'); x2++){
 
@@ -65,13 +65,14 @@ public class AI {
               best  = move;
             }
 
-            print(tmp);
-            System.out.println(score);
+            //print(tmp);
+            //System.out.println(score);
 
           }
 
         }
         }
+        
         }
 
       }
@@ -144,7 +145,7 @@ public class AI {
 
     }
 
-    public Move tmpMove(Board board){
+    public Move randMove(Board board){
 
       Random rand = new Random();
       int pc = 0;
@@ -189,7 +190,7 @@ public class AI {
 
       }
       }
-      
+
       print(board);
 
       return fb;
