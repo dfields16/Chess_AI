@@ -28,6 +28,5 @@ hs_err_pid*
 .project
 .classpath
 .settings
-.recommenders
-.metadata
-.recommenders
+**/.recommenders
+**/.metadata
