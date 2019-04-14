@@ -80,6 +80,20 @@ public class BroadcastServer {
                 break;
             case "READY":
                 // Start Game
+                client.ready();
+                boolean startGame = false;
+                if (clients.size() > 1) {
+                    for (Client c : clients) {
+                        if (!c.isReady()) {
+                            startGame = false;
+                            break;
+                        }
+                        startGame = true;
+                    }
+                }
+                if (startGame) {
+                    client.out.writeObject("BEGIN");
+                }
                 break;
             default:
                 Move move = Move.deserialize(data[0] + " " + data[1]);
@@ -164,6 +178,7 @@ public class BroadcastServer {
         public ObjectOutputStream out;
         public ObjectInputStream in;
         public String name;
+        private boolean ready = false;
 
         public Client(String name, Socket socket) throws IOException {
             this.name = name;
@@ -171,6 +186,14 @@ public class BroadcastServer {
             this.out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();
             this.in = new ObjectInputStream(socket.getInputStream());
+        }
+
+        public void ready() {
+            ready = true;
+        }
+
+        public boolean isReady() {
+            return ready;
         }
 
         public void close() {

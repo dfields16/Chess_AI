@@ -11,6 +11,7 @@ public class Client {
   public int team;
   public long timeLimit = 120000;
   private String m1, m2;
+
   public Client(Game gm, InetAddress ip, int port) {
     game = gm;
     m1 = m2 = "";
@@ -40,7 +41,7 @@ public class Client {
   public void interpretData(String[] data) {
     switch (data[0]) {
     case "OK":
-      if(m1 != m2){
+      if (m1 != m2) {
         System.out.println(m1);
         Util.movePiece(game.board, Move.deserialize(m1), game.board.turn);
         game.board.nextTurn();
@@ -53,7 +54,6 @@ public class Client {
       client.sendData("READY");
       break;
     case "ILLEGAL":
-
       break;
     case "WINNER":
 
@@ -62,6 +62,8 @@ public class Client {
 
       break;
     case "WELCOME":
+      break;
+    case "BEGIN":
       break;
     default:
       System.out.println(data[0]);
