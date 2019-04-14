@@ -118,15 +118,16 @@ public class AI {
       for (int y = 0; y < board.len('y'); y++){
       for (int x = 0; x < board.len('x'); x++){
           
-          if(board.piece(x,y) == null) continue;
-                 
-          if(x > 1 && x < 6 && y > 1 && y < 6) mod = 2;
-          
-          if (board.piece(x,y).side == board.turn) {
-            val += board.piece(x,y).type.value*mod;
-          } else {
-            val -= board.piece(x,y).type.value*mod;
-          }
+        if(board.piece(x,y) == null) continue;
+               
+        if(x > 1 && x < 6 && y > 1 && y < 6) mod = 2;
+        
+        if (board.piece(x,y).side == board.turn) {
+          val += board.piece(x,y).type.value*mod;
+        } else {
+          val -= board.piece(x,y).type.value*mod;
+        }
+        
       }
       }
       return val;

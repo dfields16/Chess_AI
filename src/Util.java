@@ -1,10 +1,9 @@
 import java.util.List;
-import java.awt.Point;
 import java.util.ArrayList;
 
 public class Util {
 
-  public static void resetPieces(Board board) {
+  public static void resetPieces(Board board){
     ChessPiece type = ChessPiece.PAWN;
     int side = 1;
 
@@ -43,23 +42,27 @@ public class Util {
     return board;
   }
 
-  public static boolean inCheck(Board board, Move move, int side) {
+  public static boolean setCheck(Board board){
 
-    Util.forcePiece(board,move);
-    board.turn = side;
-    
-    Square king = getKing(board,side);
+    Square mking = getKing(board,board.turn);
+    Square tking = getKing(board,(board.turn == 0) ? 1 : 0);
+
     Move m;
-     
-    if(king.piece != null) {
-      
-      System.out.println(king.coord.getX() + " " + king.coord.getY());
-    
+
+    if(mking.piece != null && tking.piece != null) {
+
+      mking.piece.checked = 0;
+
       for (int y = 0; y < 8; y++) {
       for (int x = 0; x < 8; x++) {
-      if (board.piece(x,y) != null && board.piece(x,y).side != side) {
-          m = new Move(board.coord(x,y),king.coord);
-          if(validMove(board,m)) return true;    
+      if (board.piece(x,y) != null && board.piece(x,y).side == board.turn) {
+
+        m = new Move(board.coord(x,y),tking.coord);
+        if(validMove(new Board(board),m)){
+          tking.piece.checked = 1;
+          return true;
+        }
+
       }
       }
       }
@@ -69,143 +72,62 @@ public class Util {
     return false;
   }
 
-//  public static boolean inCheckmate(Square[][] board, int side) {
-//    Square king = getKing(board,side);
-//    int kx = (int) king.coord.getX();
-//  int ky = (int) king.coord.getY();
-//  int[] opponentCapture = new int[8];
-//    boolean checkmate = false;
-//    if(board[ky][kx].piece.checked == 0) {
-//      checkmate = false;
-//    }
-//    else {
-//
-//      Point tempKing;
-//      Point newMove;
-//      Move tempMove;
-//
-//      for(int x = 0; x < 8; x++) {
-//        for(int y = 0; y < 8; y++) {
-//          newMove = new Point(x,y);
-//          if(ky+1 < 8 && board[y][x].piece != null && board[y][x].piece.side != side) {
-//            // NEed to change move to Move(point, point);
-//            tempKing = new Point(kx, ky+1);
-//            tempMove = new Move(newMove, tempKing);
-//            if(validMove(board, tempMove, board[y][x].piece.side)) {
-//              opponentCapture[0]++;
-//            }
-//          }
-//          if(ky+1 < 8 && kx+1 < 8 && board[y][x].piece != null && board[y][x].piece.side != side) {
-//            tempKing = new Point(kx+1, ky+1);
-//            tempMove = new Move(newMove, tempKing);
-//            if(validMove(board, tempMove, board[y][x].piece.side)) {
-//              opponentCapture[1]++;
-//            }
-//          }
-//          if(ky-1 >0 && kx+1 < 8 && board[y][x].piece != null && board[y][x].piece.side != side) {
-//            tempKing = new Point(kx+1, ky-1);
-//            tempMove = new Move(newMove, tempKing);
-//            if(validMove(board, tempMove, board[y][x].piece.side)) {
-//              opponentCapture[2]++;
-//            }
-//          }
-//          if(ky-1 >0 && kx-1 >0 && board[y][x].piece != null && board[y][x].piece.side != side) {
-//            tempKing = new Point(kx-1, ky-1);
-//            tempMove = new Move(newMove, tempKing);
-//            if(validMove(board, tempMove, board[y][x].piece.side)) {
-//              opponentCapture[3]++;
-//            }
-//          }
-//          if(kx-1 >0 && ky+1 < 8 && board[y][x].piece != null && board[y][x].piece.side != side) {
-//            tempKing = new Point(kx-1, ky);
-//            tempMove = new Move(newMove, tempKing);
-//            if(validMove(board, tempMove, board[y][x].piece.side)) {
-//              opponentCapture[4]++;
-//            }
-//          }
-//          if(kx+1 < 8 && board[y][x].piece != null && board[y][x].piece.side != side) {
-//            tempKing = new Point(kx+1, ky);
-//            tempMove = new Move(newMove, tempKing);
-//            if(validMove(board, tempMove, board[y][x].piece.side)) {
-//              opponentCapture[5]++;
-//            }
-//          }
-//          if(ky-1 >0 && board[y][x].piece != null && board[y][x].piece.side != side) {
-//            tempKing = new Point(kx, ky-1);
-//            tempMove = new Move(newMove, tempKing);
-//            if(validMove(board, tempMove, board[y][x].piece.side)) {
-//              opponentCapture[6]++;
-//            }
-//          }
-//          if(kx-1 < 8 && board[y][x].piece != null && board[y][x].piece.side != side) {
-//            tempKing = new Point(kx-1, ky);
-//            tempMove = new Move(newMove, tempKing);
-//            if(validMove(board, tempMove, board[y][x].piece.side)) {
-//              opponentCapture[7]++;
-//            }
-//          }
-//        }
-//      }
-//
-//      if(kx+1 < 8 && ky+1<8 ) {
-//          if(opponentCapture[0] != 0 && opponentCapture[1] != 0 && opponentCapture[5] != 0) {
-//            checkmate = true;
-//          }
-//        }
-//      else if(kx-1>0  && ky+1<8 ) {
-//          if(opponentCapture[4] != 0 && opponentCapture[7] != 0 && opponentCapture[0] != 0) {
-//            checkmate = true;
-//          }
-//        }
-//      else if(kx-1>0  && ky-1>0 ) {
-//          if(opponentCapture[6] != 0 && opponentCapture[7] != 0 && opponentCapture[3] != 0) {
-//            checkmate = true;
-//          }
-//        }
-//      else if(kx+1<8  && ky-1>0 ) {
-//          if(opponentCapture[6] != 0 && opponentCapture[5] != 0 && opponentCapture[2] != 0) {
-//            checkmate = true;
-//          }
-//        }
-//      else {
-//        int sum = 0;
-//        for(int i = 0; i < 8; i++) {
-//          if(opponentCapture[i] == 0) { // means king can go there
-//            sum = 0;
-//            break;
-//          }
-//          sum += opponentCapture[i];
-//        }
-//        if(sum != 0)
-//          checkmate = true;
-//      }
-//    }
-//
-//    return checkmate;
-//
-//  }
+  public static boolean inCheck(Board b, Move move){
 
-  public static void addHistory(Board board,Move move) {
+    Board board = new Board(b);
 
-    if (checkCapture(board, move)) {
+    Util.forcePiece(board,move);
+
+    Square king = getKing(board,board.turn);
+    Move m;
+    
+    System.out.println(board.active + " checking for: " + king.piece.side);  
+
+    if(king.piece != null) {
+
+      for (int y = 0; y < 8; y++) {
+      for (int x = 0; x < 8; x++) {
+      if (board.piece(x,y) != null && board.piece(x,y).side != board.turn) {
+          m = new Move(board.coord(x,y),king.coord);
+          if(validMove(board,m)) {
+            System.out.println("cant move in check");            
+            return true;    
+          }
+      }
+      }
+      }
+
+    }
+
+    return false;
+  }
+
+  public static void addHistory(Board board,Move move){
+
+    if (checkCapture(board,move)) {
       board.history.add(new Move(move.start, move.end,board.piece(move.x2(),move.y2())));
     } else {
       board.history.add(new Move(move.start, move.end,null));
     }
 
   }
-  
-  public static boolean forcePiece(Board board, Move move) {
 
-      board.valid = true;
-      board.squares[move.y1()][move.x1()].piece.moved = 1;
-      board.squares[move.y2()][move.x2()].piece = board.squares[move.y1()][move.x1()].piece;
-      board.squares[move.y1()][move.x1()].piece = null;
-      return true;
-      
+  public static boolean forcePiece(Board board, Move move){
+
+    if(board.active > 0) addHistory(board,move);
+
+    board.valid = true;
+    board.squares[move.y1()][move.x1()].piece.moved = 1;
+    board.squares[move.y2()][move.x2()].piece = board.squares[move.y1()][move.x1()].piece;
+    board.squares[move.y1()][move.x1()].piece = null;
+    
+    // DID WE PUT ENEMY INTO CHECK
+    //setCheck(board);
+    
+    return true;
   }
 
-  public static boolean movePiece(Board board, Move move) {
+  public static boolean movePiece(Board board, Move move){
 
     if( !validMove(board,move) ) {
       board.valid = false;
@@ -218,6 +140,10 @@ public class Util {
       board.squares[move.y1()][move.x1()].piece.moved = 1;
       board.squares[move.y2()][move.x2()].piece = board.squares[move.y1()][move.x1()].piece;
       board.squares[move.y1()][move.x1()].piece = null;
+      
+      // DID WE PUT ENEMY INTO CHECK
+      setCheck(board);
+      
       return true;
     }
 
@@ -339,85 +265,83 @@ public class Util {
       // MOVING INTO CHECK?
       
       if(start.side == board.turn && board.active == 1){
-        if( inCheck(new Board(board),move,board.turn) ) valid = false;
+        System.out.println("doing check");
+        if( inCheck(board,move) ) valid = false;
       }
 
-      // // CAN CASTLE?
-      // // If king is moving, and not in check and has not moved yet
-      // if (start.type == ChessPiece.KING && start.side == turn && start.checked == 0
-      // && start.moved == 0) {
-
-      // Square corner;
-      // Move castle;
-      // // DETECT DIRECTION/AVAILABILITY
-      // // trying to castle small side
-      // if (dy == 0 && dx > 0 && dist == 2) {
-      // corner = board[move.y2()][move.x2() + 1];
-      // castle = new Move(corner.coord, board[move.y2()][move.x2() - 1].coord, null);
-      // if (corner.piece.type == ChessPiece.ROOK && corner.piece.moved == 0 &&
-      // !checkCollision(board, move)) {
-      // movePiece(board, castle, turn);
-      // valid = true;
-      // }
-      // // trying to castle big side
-      // } else if (dy == 0 && dx < 0 && dist == 3) {
-      // corner = board[move.y2()][move.x2() - 1];
-      // castle = new Move(corner.coord, board[move.y2()][move.x2() + 1].coord, null);
-      // if (corner.piece.type == ChessPiece.ROOK && corner.piece.moved == 0) {
-      // movePiece(board, castle, turn);
-      // valid = true;
-      // }
-      // }
-      // }
+      // CAN CASTLE?
+      // If king is moving, and not in check and has not moved yet
+//      if (start.type == ChessPiece.KING && start.side == board.turn && start.checked == 0 && start.moved == 0) {
+//
+//        Square corner;
+//        Move castle;
+//        // DETECT DIRECTION/AVAILABILITY
+//        // trying to castle small side
+//        if (dy == 0 && dx > 0 && dist == 2) {
+//          corner = board.getSquare(move.x2() + 1,move.y2());
+//          castle = new Move(corner.coord, board.coord(move.x2()-1,move.y2()), null);
+//          if (corner.piece.type == ChessPiece.ROOK && corner.piece.moved == 0 && !checkCollision(board, move)) {
+//            forcePiece(board,castle);
+//            valid = true;
+//          }
+//        // trying to castle big side
+//        } else if (dy == 0 && dx < 0 && dist == 3) {
+//          corner = board.getSquare(move.x2()-1,move.y2());
+//          castle = new Move(corner.coord,board.coord(move.x2()-1,move.y2()), null);
+//        if (corner.piece.type == ChessPiece.ROOK && corner.piece.moved == 0) {
+//          forcePiece(board, castle);
+//          valid = true;
+//        }
+//        }
+//      }
 
       return valid;
   }
 
   public static boolean checkCollision(Board board, Move move){
-      // knight is allowed to pass over pieces, all others cannot
-      if (board.piece(move.x1(),move.y1()) != null && board.piece(move.x1(),move.y1()).type != ChessPiece.KNIGHT){
-          int xp = move.x2();
-          int yp = move.y2();
-          while (true){
-              // increment in direction of root
-              if(xp > move.x1()) {
-                  xp--;
-              }else if (xp < move.x1()){
-                  xp++;
-              }
-              if(yp > move.y1()){
-                  yp--;
-              }else if(yp < move.y1()){
-                  yp++;
-              }
-              // if at root exit while
-              if (yp == move.y1() && xp == move.x1()) break;
-              // if piece found exit validation
-              if (board.piece(xp,yp) != null) return true;
-          }
+    // knight is allowed to pass over pieces, all others cannot
+    if (board.piece(move.x1(),move.y1()) != null && board.piece(move.x1(),move.y1()).type != ChessPiece.KNIGHT){
+      int xp = move.x2();
+      int yp = move.y2();
+      while (true){
+        // increment in direction of root
+        if(xp > move.x1()) {
+            xp--;
+        }else if (xp < move.x1()){
+            xp++;
+        }
+        if(yp > move.y1()){
+            yp--;
+        }else if(yp < move.y1()){
+            yp++;
+        }
+        // if at root exit while
+        if (yp == move.y1() && xp == move.x1()) break;
+        // if piece found exit validation
+        if (board.piece(xp,yp) != null) return true;
       }
-      return false;
+    }
+    return false;
   }
 
   public static Square getKing(Board board, int side) {
 
-      for (int y = 0; y < 8; y++) {
-          for (int x = 0; x < 8; x++) {
-              if (board.piece(x,y) != null && board.piece(x,y).side == side && board.piece(x,y).type == ChessPiece.KING) {
-                  Square sq = board.squares[y][x];
-                  return sq;
-              }
-          }
+    for (int y = 0; y < 8; y++) {
+      for (int x = 0; x < 8; x++) {
+        if (board.piece(x,y) != null && board.piece(x,y).side == side && board.piece(x,y).type == ChessPiece.KING) {
+          Square sq = board.squares[y][x];
+          return sq;
+        }
       }
+    }
       
-      return null;
+    return null;
   }
 
   static boolean listContains(List<Float> list, float key) {
-      for (float elem : list)
-          if (elem == key)
-              return true;
-      return false;
+    for (float elem : list)
+      if (elem == key) return true;
+    return false;
   }
 
 }

@@ -44,10 +44,10 @@ public class Server {
 
     if( Util.movePiece(board, move) ) {
 
-      board.turn = (board.turn == 0) ? 1 : 0;
+      board.turn  = (board.turn == 0) ? 1 : 0;
       board.timer = 1;
       
-      if((board.turn==0 && wside==0) || (board.turn==1 && bside==0)){        
+      if( ai && ((board.turn==0 && wside==0) || (board.turn==1 && bside==0)) ){
         aiTurn();
       }
 

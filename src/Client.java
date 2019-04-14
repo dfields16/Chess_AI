@@ -17,6 +17,7 @@ public class Client{
 
   public Board sendMove(Board board,Move move) {
     board = server.makeMove(move);
+    side = board.turn;
     return board;
   }
 
