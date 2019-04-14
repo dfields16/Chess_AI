@@ -11,12 +11,15 @@ import java.util.Map;
 public class BroadcastServer {
     ServerSocket serverSocket;
     public static long timeLimit = 20;
-    private static Map<Integer, Server> games = new HashMap<>();
+    private static Map<Integer, ServerGM> games = new HashMap<>();
     private static ArrayList<Client> clients = new ArrayList<>();
+    private static boolean singlePlayer = false;
 
     public static void main(String args[]) {
         BroadcastServer server = new BroadcastServer();
-
+        if(args.length > 0){
+            if(args[0] == "singlePlayer")singlePlayer = true;
+        }
         try {
             server.startServer(1200);
         } catch (Exception e) {
@@ -31,8 +34,7 @@ public class BroadcastServer {
             Socket connection = serverSocket.accept();
             connection.setTcpNoDelay(true);
             Client c = new Client(connection);
-
-            for (Map.Entry<Integer, Server> entry : games.entrySet()) {
+            for (Map.Entry<Integer, ServerGM> entry : games.entrySet()) {
                 if (c.game != -1)
                     break;
                 if (entry.getValue().c0 == null) {
@@ -52,7 +54,7 @@ public class BroadcastServer {
             }
             if (c.game == -1) {
                 int gameID = (int) (Math.random() * 1000000);
-                Server game = new Server();
+                ServerGM game = new ServerGM();
                 game.board.turnlen = (int) timeLimit;
                 games.put(gameID, game);
                 c.name = "0";
@@ -65,6 +67,10 @@ public class BroadcastServer {
             ClientHandler cl = new ClientHandler(clients.get(clients.size() - 1));
             Thread clientThread = new Thread(cl);
             clientThread.start();
+            if(singlePlayer) {
+                games.get(c.game).ai = true;
+                break;
+            }
         }
     }
 
@@ -102,6 +108,7 @@ public class BroadcastServer {
 
     public void gameEngine(Client client, String[] data) {
         try {
+            ServerGM game = games.get(client.game);
             switch (data[0]) {
             case "OK":
                 // IDK
@@ -118,15 +125,16 @@ public class BroadcastServer {
                         }
                         startGame = true;
                     }
+                }else if(game.ai){
+                    startGame = true;
                 }
                 if (startGame) {
-                    games.get(client.game).c0.out.writeObject("BEGIN");
-                    games.get(client.game).c1.out.writeObject("BEGIN");
-                    games.get(client.game).board.timer = 0;
+                    if(game.c0 != null)game.c0.out.writeObject("BEGIN");
+                    if(game.c1 != null)game.c1.out.writeObject("BEGIN");
+                    game.board.timer = 0;
                 }
                 break;
             default:
-                Server game = games.get(client.game);
                 Move move = Move.deserialize(data[0] + " " + data[1]);
                 boolean valid = false;
                 if (game.board.turn == Integer.parseInt(client.name)) {
@@ -137,13 +145,22 @@ public class BroadcastServer {
                     game.board.timer = 0;
                     Util.movePiece(game.board, move, game.board.turn);
                     game.board.nextTurn();
-                    if (client.name.equals("0")) {
+                    if (client.name.equals("0") && !game.ai) {
                         game.c1.out.writeObject(data[0] + " " + data[1]);
                     } else {
                         game.c0.out.writeObject(data[0] + " " + data[1]);
                     }
-
                     client.out.writeObject("OK");
+                    if(game.ai){
+                        Move aiMove = game.aiTurn();
+                        System.out.println("[DeleteMe]" + aiMove.serialize());
+                        game.board.nextTurn();
+                        if (client.name.equals("1")) {
+                            game.c1.out.writeObject(aiMove.serialize());
+                        } else {
+                            game.c0.out.writeObject(aiMove.serialize());
+                        }
+                    }
                 } else {
                     System.out.println("[Move][Invalid] " + move.serialize());
                     client.out.writeObject("ILLEGAL");

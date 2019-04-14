@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 class Game extends JPanel {
   private static final long serialVersionUID = 1L;
 
-  Client client;
+  ClientGM client;
 
   Board board;
   Point cursor;
@@ -28,7 +28,7 @@ class Game extends JPanel {
 
   public Game(String IPAddress, int portNo, int depth) {
 	  try {
-	      client = new Client(this, InetAddress.getByName(IPAddress), portNo);
+	      client = new ClientGM(this, InetAddress.getByName(IPAddress), portNo);
 	    } catch (UnknownHostException e) {
 	      e.printStackTrace();
 	    }
@@ -39,7 +39,7 @@ class Game extends JPanel {
 
   public Game(String IPAddress, int portNo) {
 	  try {
-	      client = new Client(this, InetAddress.getByName(IPAddress), portNo);
+	      client = new ClientGM(this, InetAddress.getByName(IPAddress), portNo);
 	    } catch (UnknownHostException e) {
 	      e.printStackTrace();
 	    }
@@ -50,7 +50,8 @@ class Game extends JPanel {
 
   public Game() {
     try {
-      client = new Client(this, InetAddress.getByName("localhost"), 1200);
+      client = new ClientGM(this, InetAddress.getByName("localhost"), 1200);
+      client.isSinglePlayer = true;
     } catch (UnknownHostException e) {
       e.printStackTrace();
     }

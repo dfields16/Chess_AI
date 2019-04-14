@@ -2,13 +2,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class AI {
-    
+
     //what side are we trying to play for
     int side;
-    
+
     int depth;
     int level = 0;
-    
+
     Move best;
 
     public AI(int skill){
@@ -19,9 +19,9 @@ public class AI {
 
       side  = s;
       best  = null;
-      
+
       bestMove( new Board(b) );
-      
+
       return best;
     }
 
@@ -30,7 +30,7 @@ public class AI {
       Move move;
 
       level++;
-      
+
       int score = -1000000;
       int val   = 0;
 
@@ -45,12 +45,12 @@ public class AI {
         for(int x2 = 0; x2 < board.len('x'); x2++){
 
           move = new Move(x1,y1,x2,y2);
-          
+
           Board tmp = new Board(board);
-          
+
           //IF WE HAVE A VALID MOVE GO DOWN THE RABBIT HOLE
           if( Util.movePiece(tmp,move,side) ){
-            
+
             // GOING DEEPER OR GETTING A SCORE
             if(level<=depth){
               val = bestMove(tmp);
@@ -58,15 +58,15 @@ public class AI {
             }else {
               val = heuristic(tmp);
             }
-            
+
             // PROCESS THE SCORE AND MOVE
             if(val > score){
               score = val;
               best  = move;
             }
 
-            print(tmp);
-            System.out.println(score);
+            // print(tmp);
+            // System.out.println(score);
 
           }
 
@@ -101,17 +101,17 @@ public class AI {
     }
 
     private int heuristic(Board board) {
-      
+
       int val = 0;
-      int mod = 1;  
-      
+      int mod = 1;
+
       for (int y = 0; y < board.len('y'); y++){
       for (int x = 0; x < board.len('x'); x++){
-          
+
           if(board.piece(x,y) == null) continue;
-                 
+
           if(x > 1 && x < 6 && y > 1 && y < 6) mod = 2;
-          
+
           if (board.piece(x,y).side == side) {
             val += board.piece(x,y).type.value*mod;
           } else {
@@ -123,14 +123,14 @@ public class AI {
     }
 
     public void print(Board board) {
-      
+
       System.out.println("\n-----------------------------");
-      
+
       String row;
-      
-      for (int y1 = 0; y1 < board.len('y'); y1++){  row = "";         
-      for (int x1 = 0; x1 < board.len('x'); x1++){        
-        
+
+      for (int y1 = 0; y1 < board.len('y'); y1++){  row = "";
+      for (int x1 = 0; x1 < board.len('x'); x1++){
+
         if(board.piece(x1,y1) != null) {
           row = row + board.piece(x1,y1).type.name().substring(0,1) + " ";
         }else {
@@ -189,7 +189,7 @@ public class AI {
 
       }
       }
-      
+
       print(board);
 
       return fb;
