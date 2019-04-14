@@ -22,7 +22,31 @@ class Game extends JPanel {
   Board board;
   Point cursor;
   Move click;
+  long time = 0;
+  long timeLimit = 0;
   BufferedImage ui;
+
+  public Game(String IPAddress, int portNo, int depth) {
+	  try {
+	      client = new Client(this, InetAddress.getByName(IPAddress), portNo);
+	    } catch (UnknownHostException e) {
+	      e.printStackTrace();
+	    }
+	    setLayout(null);
+	    startGame();
+	    gameListener();
+  }
+
+  public Game(String IPAddress, int portNo) {
+	  try {
+	      client = new Client(this, InetAddress.getByName(IPAddress), portNo);
+	    } catch (UnknownHostException e) {
+	      e.printStackTrace();
+	    }
+	    setLayout(null);
+	    startGame();
+	    gameListener();
+  }
 
   public Game() {
     try {
@@ -66,7 +90,7 @@ class Game extends JPanel {
 
         // previously dealt with a final click, flush the trigger
         if (click.end != null) click.clear();
-
+        if(!client.gameActive)return;
         // SEE IF A SQUARE WAS CLICKED
         for (int y = 0; y < 8; y++){
           for (int x = 0; x < 8; x++){

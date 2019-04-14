@@ -34,7 +34,7 @@ public class TCPClient {
 		try {
 			msg = (String) input.readObject();
 		} catch (Exception e) {
-			e.printStackTrace();
+			// e.printStackTrace();
 			System.out.println("Connection Broken");
 			status = false;
 			close();

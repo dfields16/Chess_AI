@@ -10,7 +10,7 @@ public class Client {
   private Game game;
   public int team;
   private String m1, m2;
-  private boolean gameActive = false;
+  public boolean gameActive = false;
 
   public Client(Game gm, InetAddress ip, int port) {
     game = gm;

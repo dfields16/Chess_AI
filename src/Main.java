@@ -6,14 +6,14 @@ public class Main{
 
   public static void main(String[] args) throws IOException
   {
-    Game game = new Game();
 
-    JFrame frame  = new JFrame("Chess Master");
+    JFrame frame = new JFrame("Chess Game");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(1020,765);
+    frame.setSize(1020, 765);
     frame.setResizable(false);
 
-    frame.add(game);
+    Menu menu = new Menu(frame);
+    frame.add(menu);
     frame.setVisible(true);
   }
 
