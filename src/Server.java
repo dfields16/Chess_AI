@@ -5,7 +5,7 @@ import java.util.TimerTask;
 public class Server {
 
   Board board;
-  AI cpu      = new AI(3);
+  AI cpu = new AI(1);
   
   boolean ai  = true;
   
@@ -42,7 +42,7 @@ public class Server {
 
   public Board makeMove(Move move){
 
-    if( Util.movePiece(board, move, board.turn) ) {
+    if( Util.movePiece(board, move) ) {
 
       board.turn = (board.turn == 0) ? 1 : 0;
       board.timer = 1;
@@ -59,8 +59,8 @@ public class Server {
   }
   
   public Move aiTurn() {
-    Move move = cpu.getMove(board,board.turn);
-    if(move != null) Util.movePiece(board, move,board.turn);
+    Move move = cpu.getMove(board);
+    if(move != null) Util.movePiece(board,move);
     board.turn = (board.turn == 0) ? 1 : 0;
     return move;
   }
@@ -74,6 +74,7 @@ public class Server {
   
   public void startGame(){
     board = new Board(8,8);
+    board.active = 1;
     Util.resetPieces(board);
   }
 

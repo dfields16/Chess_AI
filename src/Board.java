@@ -15,9 +15,12 @@ class Board{
 
   int checked = 0;
   int mated   = 0;
+  
+  int active  = 0;
 
   Board(Board board){
 
+    active  = 0;
     valid   = board.valid;
     checked = board.checked;
     mated   = board.mated;
