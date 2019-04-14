@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 enum ChessPiece {
-  EMPTY(0, 0), KING(1250, 25), QUEEN(500, 150), BISCHOP(200, 75), KNIGHT(250, 100), ROOK(200, 75), PAWN(25, 30);
+  EMPTY(0, 0), KING(1250, 25), QUEEN(500, 150), BISCHOP(200, 75), KNIGHT(250, 100), ROOK(200, 75), PAWN(50, 30);
 
   final int value;
   final int moveValue;
@@ -13,7 +13,6 @@ enum ChessPiece {
 }
 
 class Piece implements Serializable {
-
   private static final long serialVersionUID = -3427679479734507507L;
 
   ChessPiece type;
