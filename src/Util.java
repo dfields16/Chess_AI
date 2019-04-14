@@ -273,7 +273,7 @@ public class Util {
   }
 
   public static boolean validMove(Square[][] board, Move move, int turn) {
-
+    try{
       Piece start = board[move.y1()][move.x1()].piece;
       Piece end   = board[move.y2()][move.x2()].piece;
 
@@ -383,8 +383,13 @@ public class Util {
       // }
       // }
       // }
-
       return valid;
+
+      }catch(NullPointerException e){
+        Util.print(board);
+        e.printStackTrace();
+        return false;
+      }
   }
 
   public static boolean checkCollision(Square[][] board, Move move) {

@@ -101,23 +101,22 @@ public class AI {
     }
 
     private int heuristic(Board board) {
-
       int val = 0;
       int mod = 1;
 
       for (int y = 0; y < board.len('y'); y++){
-      for (int x = 0; x < board.len('x'); x++){
-
+        for (int x = 0; x < board.len('x'); x++){
           if(board.piece(x,y) == null) continue;
-
+          Piece p = board.piece(x, y);
           if(x > 1 && x < 6 && y > 1 && y < 6) mod = 2;
+          if((x == 4 || x == 5) && (y == 4 || y == 5)) mod = 3;
 
           if (board.piece(x,y).side == side) {
-            val += board.piece(x,y).type.value*mod;
+            val += p.type.value + p.type.moveValue*mod;
           } else {
-            val -= board.piece(x,y).type.value*mod;
+            val -= p.type.value + p.type.moveValue*mod;
           }
-      }
+       }
       }
       return val;
     }

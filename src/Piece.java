@@ -1,12 +1,13 @@
 import java.io.Serializable;
 
 enum ChessPiece {
-  EMPTY(0), KING(1000), QUEEN(100), BISCHOP(50), KNIGHT(75), ROOK(50), PAWN(25);
+  EMPTY(0, 0), KING(1250, 25), QUEEN(500, 150), BISCHOP(200, 75), KNIGHT(250, 100), ROOK(200, 75), PAWN(25, 30);
 
   final int value;
-
-  ChessPiece(int v) {
+  final int moveValue;
+  ChessPiece(int v, int m) {
     value = v;
+    moveValue = m;
   }
 
 }
