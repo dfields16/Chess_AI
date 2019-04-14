@@ -30,7 +30,7 @@ public class TCPClient {
 	}
 
 	public String recieveData() {
-		String msg = "Error";
+		String msg = "ERROR";
 		try {
 			msg = (String) input.readObject();
 		} catch (Exception e) {

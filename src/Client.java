@@ -5,11 +5,11 @@ import java.util.TimerTask;
 
 public class Client {
   private TCPClient client;
-  private TimerTask recieveDataTask;
-  private Timer timer;
+  private TimerTask recieveDataTask, gameTimer;
+  private Timer timer, timer2;
   private Game game;
   public int team;
-  public long timeLimit = 120000;
+  private long startTime;
   private String m1, m2;
 
   public Client(Game gm, InetAddress ip, int port) {
@@ -19,6 +19,7 @@ public class Client {
     try {
       client = new TCPClient(ip, port);
       timer = new Timer();
+      timer2 = new Timer();
       recieveDataTask = new TimerTask() {
         public void run() {
           // RecieveData
@@ -28,10 +29,16 @@ public class Client {
           System.out.println("[Server] " + msg);
 
           interpretData(msg.split(" "));
+        }
+      };
+      gameTimer = new TimerTask() {
+        public void run() {
+          game.time = System.currentTimeMillis() - startTime;
           game.updateUI();
         }
       };
       timer.scheduleAtFixedRate(recieveDataTask, 0, 10);
+      timer2.scheduleAtFixedRate(gameTimer, 0, 25);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -46,10 +53,13 @@ public class Client {
         Util.movePiece(game.board, Move.deserialize(m1), game.board.turn);
         game.board.nextTurn();
         m2 = m1;
+        startTime = System.currentTimeMillis();
+        game.time = 0;
+        game.updateUI();
       }
       break;
     case "INFO":
-      timeLimit = Long.parseLong(data[1]);
+      game.timeLimit = Long.parseLong(data[1]);
       team = (data[2].equals("White")) ? 0 : 1;
       client.sendData("READY");
       break;
@@ -64,6 +74,11 @@ public class Client {
     case "WELCOME":
       break;
     case "BEGIN":
+      startTime = System.currentTimeMillis();
+      game.time = 0;
+      game.updateUI();
+      break;
+    case "ERROR":
       break;
     default:
       System.out.println(data[0]);

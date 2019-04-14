@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class BroadcastServer {
     ServerSocket serverSocket;
-    public static long timeLimit = 1200000;
+    public static long timeLimit = 120*1000;
     private static Server gameServer;
     private static ArrayList<Client> clients = new ArrayList<>();
 
