@@ -8,21 +8,29 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 class Game extends JPanel {
   private static final long serialVersionUID = 1L;
-  
-  Client client = new Client();
 
-  Board  board;
+  Client client;
+
+  Board board;
   Point cursor;
-  Move   click;
+  Move click;
 
   BufferedImage ui;
 
   public Game() {
+    try {
+      client = new Client(this, InetAddress.getByName("localhost"), 1200);
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
     setLayout(null);
     startGame();
     gameListener();
@@ -30,13 +38,14 @@ class Game extends JPanel {
 
   public void startGame(){
     click   = new Move();
-    board   = client.getBoard();
+    board = new Board(8, 8);
+    Util.resetPieces(board);
   }
 
   ///////////////////////////////////////////////////////////////////////////////
   // LISTENER
   ///////////////////////////////////////////////////////////////////////////////
-  
+
   public void gameListener() {
 
     addMouseMotionListener(new MouseAdapter() {
@@ -66,8 +75,8 @@ class Game extends JPanel {
             // selected
             if( board.shape(x,y).contains(e.getPoint()) && click.start == board.coord(x,y)){
               // do nothing because validator below will catch it
-            }else if (board.in(x,y,e.getPoint()) && click.start == null && board.piece(x,y) != null && 
-                      board.piece(x,y).side == board.turn && board.piece(x,y).side == client.side)
+            }else if (board.in(x,y,e.getPoint()) && click.start == null && board.piece(x,y) != null &&
+                      board.piece(x,y).side == board.turn && board.piece(x,y).side == client.team)
             {
               click.start = new Point(x, y);
               valid = true;
@@ -75,8 +84,8 @@ class Game extends JPanel {
             }else if( board.in(x,y,e.getPoint()) && click.start != null){
               click.end = new Point(x, y);
 
-              board  = client.sendMove(board,click);
-              System.out.println(board.turn);
+              client.sendMove(click);
+              // System.out.println(board.turn);
 
               valid = false;
             }

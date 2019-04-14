@@ -1,10 +1,12 @@
 import java.awt.Point;
 import java.awt.Shape;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-class Board{
+class Board implements Serializable{
 
-  Square[][]      squares;
+  private static final long serialVersionUID = -2975027838970495564L;
+  Square[][] squares;
   ArrayList<Move> history;
 
   boolean valid;
@@ -43,9 +45,9 @@ class Board{
     history = new ArrayList<Move>();
 
     for(int y = 0; y < sqs.length; y++){
-    for(int x = 0; x < sqs[0].length; x++){
-      squares[y][x] = new Square(sqs[y][x]);
-    }
+      for(int x = 0; x < sqs[0].length; x++){
+        squares[y][x] = new Square(sqs[y][x]);
+      }
     }
 
   }
@@ -109,5 +111,9 @@ class Board{
   public int size(int x,int y){
     return squares[y][x].size;
   }
+
+public void nextTurn() {
+  turn = (turn == 0) ? 1 : 0;
+}
 
 }

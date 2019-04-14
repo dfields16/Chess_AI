@@ -1,9 +1,11 @@
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.io.Serializable;
 
-class Square {
+class Square implements Serializable{
 
+  private static final long serialVersionUID = 4882428343945397602L;
   int size = 75;
   int offx = 215;
   int offy = 75;

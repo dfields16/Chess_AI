@@ -1,8 +1,10 @@
 import java.awt.Point;
+import java.io.Serializable;
 
-class Move{
+class Move implements Serializable{
 
-  Point start    = null;
+  private static final long serialVersionUID = -6401644785337543164L;
+  Point start = null;
   Point end      = null;
   Piece captured = null;
 
@@ -54,4 +56,20 @@ class Move{
     end   = null;
   }
 
+  public static Move deserialize(String str) {
+    Move mv = new Move();
+    mv.start = new Point(str.charAt(0) - 'A', '8' - str.charAt(1));
+    mv.end = new Point(str.charAt(3) - 'A', '8' - str.charAt(4));
+    return mv;
+  }
+
+  public String serialize() {
+    String s = "";
+    s += (char)('A' + start.getX());
+    s += (char)('8' - start.getY());
+    s += " ";
+    s += (char)('A' + end.getX());
+    s += (char)('8' - end.getY());
+    return s;
+  }
 }

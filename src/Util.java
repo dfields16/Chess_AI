@@ -218,7 +218,7 @@ public class Util {
     //if(inCheckmate(board, turn)) {
     //  System.out.println("Checkmate");
     //}
-    //    
+    //
     //
     //turn = (turn == 0) ? 1 : 0;
     //timer = 0;
@@ -273,7 +273,7 @@ public class Util {
   }
 
   public static boolean validMove(Square[][] board, Move move, int turn) {
-    
+
       Piece start = board[move.y1()][move.x1()].piece;
       Piece end   = board[move.y2()][move.x2()].piece;
 

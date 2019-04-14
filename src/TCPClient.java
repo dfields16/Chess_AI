@@ -30,15 +30,16 @@ public class TCPClient {
 	}
 
 	public String recieveData() {
-		String temp = "An Error Occurred while recieving data!";
+		String msg = "Error";
 		try {
-			temp = (String) input.readObject();
+			msg = (String) input.readObject();
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Connection Broken");
 			status = false;
 			close();
 		}
-		return temp;
+		return msg;
 	}
 
 	public void close() {
