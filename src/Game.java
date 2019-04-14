@@ -22,8 +22,6 @@ class Game extends JPanel {
   Board board;
   Point cursor;
   Move click;
-  long time = 0;
-  long timeLimit = 0;
   BufferedImage ui;
 
   public Game() {
@@ -140,7 +138,7 @@ class Game extends JPanel {
     g2.setColor((board.turn == 0) ? Color.decode("#ffffff") : Color.decode("#000000"));
     g2.fillRect(board.offx(0,0) + board.size(0,0) * 6, board.offy(0,0) - 60, board.size(0,0) * 2, 25);
     g2.setColor((board.turn == 0) ? Color.decode("#000000") : Color.decode("#ffffff"));
-    String timedis = String.valueOf("Time: ") + String.format("%03d", (time / 1000)) + " of " + String.format("%03d", timeLimit / 1000);
+    String timedis = String.valueOf("Time: ") + String.format("%03d", board.timer) + " of " + String.format("%03d", board.turnlen);
     g.setFont(new Font("default", Font.BOLD, 16));
     g2.drawString(timedis, board.offx(0,0) + 15 + board.size(0,0) * 6, board.offy(0,0) - 42);
 

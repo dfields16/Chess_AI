@@ -5,17 +5,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BroadcastServer {
     ServerSocket serverSocket;
-    public static long timeLimit = 120*1000;
-    private static Server gameServer;
+    public static long timeLimit = 20;
+    private static Map<Integer, Server> games = new HashMap<>();
     private static ArrayList<Client> clients = new ArrayList<>();
 
     public static void main(String args[]) {
         BroadcastServer server = new BroadcastServer();
-        gameServer = new Server();
-        gameServer.startGame();
 
         try {
             server.startServer(1200);
@@ -30,10 +30,38 @@ public class BroadcastServer {
         while (true) {
             Socket connection = serverSocket.accept();
             connection.setTcpNoDelay(true);
+            Client c = new Client(connection);
 
-            clients.add(new Client(String.valueOf(clients.size()), connection));
+            for (Map.Entry<Integer, Server> entry : games.entrySet()) {
+                if (c.game != -1)
+                    break;
+                if (entry.getValue().c0 == null) {
+                    c.name = "0";
+                    c.game = entry.getKey();
+                    entry.getValue().c0 = c;
+                    break;
+                } else if (entry.getValue().c1 == null) {
+                    c.name = "1";
+                    c.game = entry.getKey();
+                    entry.getValue().c1 = c;
+                    break;
+                }
+                if (entry.getValue().isFull()) {
+                    entry.getValue().startGame();
+                }
+            }
+            if (c.game == -1) {
+                int gameID = (int) (Math.random() * 1000000);
+                Server game = new Server();
+                game.board.turnlen = (int) timeLimit;
+                games.put(gameID, game);
+                c.name = "0";
+                c.game = gameID;
+                game.c0 = c;
+            }
 
-            System.out.println("[Connected] " + connection.getInetAddress());
+            clients.add(c);
+            System.out.println("[Connected] IP:" + connection.getInetAddress() + " Game_ID:" + c.game);
             ClientHandler cl = new ClientHandler(clients.get(clients.size() - 1));
             Thread clientThread = new Thread(cl);
             clientThread.start();
@@ -92,33 +120,39 @@ public class BroadcastServer {
                     }
                 }
                 if (startGame) {
-                    client.out.writeObject("BEGIN");
+                    games.get(client.game).c0.out.writeObject("BEGIN");
+                    games.get(client.game).c1.out.writeObject("BEGIN");
+                    games.get(client.game).board.timer = 0;
                 }
                 break;
             default:
+                Server game = games.get(client.game);
                 Move move = Move.deserialize(data[0] + " " + data[1]);
                 boolean valid = false;
-                if (gameServer.board.turn == Integer.parseInt(client.name)) {
-                    valid = Util.validMove(gameServer.board.squares, move, gameServer.board.turn);
+                if (game.board.turn == Integer.parseInt(client.name)) {
+                    valid = Util.validMove(game.board.squares, move, game.board.turn);
                 }
                 if (valid) {
                     System.out.print("[Move][Valid] " + move.serialize() + "\n");
-
-                    Util.movePiece(gameServer.board, move, gameServer.board.turn);
-                    gameServer.board.nextTurn();
-                    sendOthers(client.socket.getInetAddress(), data[0] + " " + data[1]);
+                    game.board.timer = 0;
+                    Util.movePiece(game.board, move, game.board.turn);
+                    game.board.nextTurn();
+                    if (client.name.equals("0")) {
+                        game.c1.out.writeObject(data[0] + " " + data[1]);
+                    } else {
+                        game.c0.out.writeObject(data[0] + " " + data[1]);
+                    }
 
                     client.out.writeObject("OK");
-                    // Message message = new Message("board", gameServer.board);
-                    // sendAll(message);
                 } else {
                     System.out.println("[Move][Invalid] " + move.serialize());
                     client.out.writeObject("ILLEGAL");
                     client.out.writeObject("LOSER");
-                    sendOthers(client.socket.getInetAddress(), "WINNER");
-
-                    // client.out.writeObject("ack ILLEGAL");
-                    // client.out.writeObject(new Message("ack", "ILLEGAL"));
+                    if (client.name.equals("0")) {
+                        game.c1.out.writeObject("WINNER");
+                    } else {
+                        game.c0.out.writeObject("WINNER");
+                    }
                 }
                 break;
             }
@@ -127,13 +161,18 @@ public class BroadcastServer {
         }
     }
 
-    public void quit(InetAddress addr) throws Exception {
-        System.out.println("Server Shutting Down...");
+    public void quit(InetAddress addr, boolean shutdownServer) {
         sendOthers(addr, "QUIT");
         for (int i = 0; i < clients.size(); i++) {
             clients.get(i).close();
         }
-        serverSocket.close();
+        if (shutdownServer)
+            try {
+                serverSocket.close();
+                System.out.println("Server Shutting Down...");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     class ClientHandler implements Runnable {
@@ -155,18 +194,27 @@ public class BroadcastServer {
                     msg = (String) client.in.readObject();
                     if (msg != null) {
                         if (msg == "QUIT") {
-                            quit(client.socket.getInetAddress());
+                            quit(client.socket.getInetAddress(), false);
                             return;
                         }
                         System.out.println("[" + client.name + "] " + msg);
                         gameEngine(client, msg.split(" "));
                     }
-
                 }
-            } catch (Exception e1) {
+            } catch (IOException | ClassNotFoundException e1) {
                 System.out.println("[Disconnect] " + client.name);
-                clients.remove(client);
-                client.close();
+                try {
+                    if (games.get(client.game).c0 == client) {
+                        games.get(client.game).c1.out.writeObject("QUIT");
+                    } else {
+                        games.get(client.game).c0.out.writeObject("QUIT");
+                    }
+                    games.remove(client.game);
+                    clients.remove(client);
+                    client.close();
+                } catch (Exception e) {
+                    // e.printStackTrace();
+                }
                 return;
             }
 
@@ -179,6 +227,7 @@ public class BroadcastServer {
         public ObjectInputStream in;
         public String name;
         private boolean ready = false;
+        public int game = -1;
 
         public Client(String name, Socket socket) throws IOException {
             this.name = name;
@@ -186,6 +235,14 @@ public class BroadcastServer {
             this.out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();
             this.in = new ObjectInputStream(socket.getInputStream());
+        }
+
+        public Client(Socket socket) throws IOException {
+            this.socket = socket;
+            this.out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
+            this.in = new ObjectInputStream(socket.getInputStream());
+            name = "-1";
         }
 
         public void ready() {

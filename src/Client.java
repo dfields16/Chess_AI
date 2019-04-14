@@ -6,11 +6,11 @@ import java.util.TimerTask;
 public class Client {
   private TCPClient client;
   private TimerTask recieveDataTask, gameTimer;
-  private Timer timer, timer2;
+  private Timer clientTimer, clock;
   private Game game;
   public int team;
-  private long startTime;
   private String m1, m2;
+  private boolean gameActive = false;
 
   public Client(Game gm, InetAddress ip, int port) {
     game = gm;
@@ -18,8 +18,8 @@ public class Client {
 
     try {
       client = new TCPClient(ip, port);
-      timer = new Timer();
-      timer2 = new Timer();
+      clientTimer = new Timer();
+      clock = new Timer();
       recieveDataTask = new TimerTask() {
         public void run() {
           // RecieveData
@@ -33,12 +33,13 @@ public class Client {
       };
       gameTimer = new TimerTask() {
         public void run() {
-          game.time = System.currentTimeMillis() - startTime;
+          if (gameActive)
+            game.board.timer++;
           game.updateUI();
         }
       };
-      timer.scheduleAtFixedRate(recieveDataTask, 0, 10);
-      timer2.scheduleAtFixedRate(gameTimer, 0, 25);
+      clientTimer.scheduleAtFixedRate(recieveDataTask, 0, 10);
+      clock.scheduleAtFixedRate(gameTimer, 0, 1000);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -49,39 +50,42 @@ public class Client {
     switch (data[0]) {
     case "OK":
       if (m1 != m2) {
-        System.out.println(m1);
         Util.movePiece(game.board, Move.deserialize(m1), game.board.turn);
         game.board.nextTurn();
         m2 = m1;
-        startTime = System.currentTimeMillis();
-        game.time = 0;
+        game.board.timer = 0;
         game.updateUI();
       }
       break;
     case "INFO":
-      game.timeLimit = Long.parseLong(data[1]);
+      game.board.turnlen = Integer.parseInt(data[1]);
       team = (data[2].equals("White")) ? 0 : 1;
       client.sendData("READY");
       break;
     case "ILLEGAL":
       break;
     case "WINNER":
-
+      gameActive = false;
       break;
     case "LOSER":
+      gameActive = false;
+      break;
+    case "TIME":
 
       break;
     case "WELCOME":
       break;
     case "BEGIN":
-      startTime = System.currentTimeMillis();
-      game.time = 0;
+      game.board.timer = 0;
       game.updateUI();
+      gameActive = true;
       break;
     case "ERROR":
+    case "QUIT":
+      System.exit(1);
       break;
     default:
-      System.out.println(data[0]);
+      game.board.timer = 0;
       Util.movePiece(game.board, Move.deserialize(data[0] + " " + data[1]), game.board.turn);
       game.board.nextTurn();
       break;
