@@ -141,7 +141,7 @@ public class BroadcastServer {
                 Move move = Move.deserialize(data[0] + " " + data[1]);
                 boolean valid = false;
                 if (game.board.turn == Integer.parseInt(client.name)) {
-                    valid = Util.validMove(game.board, move);
+                    valid = Util.validMove(game.board, move) && !Util.inCheck(game.board, move);
                 }
                 if (valid) {
                     System.out.print("[Move][Valid] " + move.serialize() + "\n");

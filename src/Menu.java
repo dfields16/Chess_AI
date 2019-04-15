@@ -72,10 +72,10 @@ public class Menu extends JPanel {
 	mImg.setBounds(260, 135, 500, 500);
 
 	btnSinglePlayer = new JButton("Single Player");
-	btnSinglePlayer.setBounds(210, 650, 150, 50);
+	btnSinglePlayer.setBounds(335, 650, 150, 50);
 
 	btnMultiPlayer = new JButton("Multi Player");
-	btnMultiPlayer.setBounds(435, 650, 150, 50);
+	btnMultiPlayer.setBounds(550, 650, 150, 50);
 
 	btnAiVsAi = new JButton("Ai vs Ai");
 	btnAiVsAi.setBounds(655, 650, 150, 50);
@@ -84,10 +84,10 @@ public class Menu extends JPanel {
 	diff = new JComboBox(difficulty);
 	diff.setBounds(365, 450, 100, 50);
 
-	portFieldU = new JTextField("Port Number");
+	portFieldU = new JTextField("port number");
 	portFieldU.setBounds(365, 350, 200, 50);
 
-	portFieldAI = new JTextField("Port Number");
+	portFieldAI = new JTextField("port number");
 	portFieldAI.setBounds(365, 350, 200, 50);
 
 
@@ -97,10 +97,10 @@ public class Menu extends JPanel {
 	IPAddrU = new JButton("Enter");
 	IPAddrU.setBounds(600, 250, 100, 50);
 
-	IPFieldU = new JTextField("IP Address");
+	IPFieldU = new JTextField("IPv4");
 	IPFieldU.setBounds(365, 250, 200, 50);
 
-	IPFieldAI = new JTextField("IP Address");
+	IPFieldAI = new JTextField("IPv4");
 	IPFieldAI.setBounds(365, 250, 200, 50);
 
 	IP_PortAI = new JLabel("Enter an IP address and Port to connect to");
@@ -168,7 +168,7 @@ public class Menu extends JPanel {
 
 	bg.add(btnSinglePlayer);
 	bg.add(btnMultiPlayer);
-	bg.add(btnAiVsAi);
+	//bg.add(btnAiVsAi);
 	bg.add(mImg);
 	menu.add(bg);
 
@@ -246,8 +246,8 @@ public class Menu extends JPanel {
 
 	IPAddrAI.addMouseListener(new MouseAdapter() {
 	  public void mouseClicked(MouseEvent e) {
-		String d = (String) diff.getSelectedItem();
-		game = new Game(IPFieldAI.getText(), Integer.parseInt(portFieldAI.getText()), Integer.parseInt(d));
+		int d = diff.getSelectedIndex() + 1;
+		game = new Game(IPFieldAI.getText(), Integer.parseInt(portFieldAI.getText()), d);
 		frame.remove(menu);
 		frame.add(game);
 		frame.revalidate();

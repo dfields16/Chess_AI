@@ -7,6 +7,7 @@ public class ServerGM {
   BroadcastServer.Client c0, c1;
   Board board;
   AI cpu = new AI(2);
+  AI human = new AI(1);
 
   boolean ai = false;
   // WHO IS ON WHICH SIDE 0:ai 1:play 1 2: player 2
@@ -45,7 +46,8 @@ public class ServerGM {
               if (c0 != null) {
                 c0.out.writeObject("TIME");
                 c0.out.writeObject("WINNER");
-              }            }
+              }
+            }
             clock.cancel();
             clock.purge();
           }
@@ -57,29 +59,60 @@ public class ServerGM {
 
   }
 
-  public Board makeMove(Move move) {
+  public void isGameOver(Move move) throws IOException {
+    Board bored = new Board(board);
+    bored.turn = (bored.turn == 0) ? 1 : 0;
+    bored.timer = 1;
+    Move hint = human.getMove(bored);
 
-    if (Util.movePiece(board, move)) {
-
-      board.turn = (board.turn == 0) ? 1 : 0;
-      board.timer = 1;
-
-      if ((board.turn == 0 && wside == 0) || (board.turn == 1 && bside == 0)) {
-        aiTurn();
+    if (hint == null) {
+      // GAME OVER
+      Square king = Util.getKing(bored, bored.turn);
+      if (king.piece.checked == 1) {
+        if (bored.turn == 0) {
+          c0.out.writeObject("WINNER");
+          c1.out.writeObject("LOSER");
+        } else {
+          c1.out.writeObject("WINNER");
+          c0.out.writeObject("LOSER");
+        }
+      } else {
+        c0.out.writeObject("TIE");
+        c1.out.writeObject("TIE");
       }
 
-      board.timer = 1;
-      board.valid = true;
     }
-
-    return board;
   }
 
   public Move aiTurn() {
     Move move = cpu.getMove(board);
     if (move != null)
       Util.movePiece(board, move);
-    // board.turn = (board.turn == 0) ? 1 : 0;
+    else {
+      Board bored = new Board(board);
+      bored.turn = (bored.turn == 0) ? 1 : 0;
+      bored.timer = 1;
+      Move hint = human.getMove(bored);
+      try{
+      if (hint == null) {
+        // GAME OVER
+        Square king = Util.getKing(bored, bored.turn);
+        if (king.piece.checked == 1) {
+          if (bored.turn == 0) {
+            c0.out.writeObject("WINNER");
+            c1.out.writeObject("LOSER");
+          } else {
+            c1.out.writeObject("WINNER");
+            c0.out.writeObject("LOSER");
+          }
+        } else {
+          c0.out.writeObject("TIE");
+          c1.out.writeObject("TIE");
+        }
+
+      }
+    }catch(IOException e){}
+    }
     return move;
   }
 

@@ -12,6 +12,7 @@ public class ClientGM {
   private String m1, m2;
   public boolean gameActive = false;
   public boolean isSinglePlayer = false;
+
   public ClientGM(Game gm, InetAddress ip, int port) {
     game = gm;
     m1 = m2 = "";
@@ -66,11 +67,24 @@ public class ClientGM {
       break;
     case "WINNER":
       gameActive = false;
-
+      GameMsg gWMsg = new GameMsg("Winner");
+      gWMsg.setBounds(game.getWidth() / 2 - 145, game.getHeight() / 2 - 50, 300, 100);
+      game.add(gWMsg);
+      game.updateUI();
       break;
     case "LOSER":
       gameActive = false;
-
+      GameMsg gLMsg = new GameMsg("Loser");
+      gLMsg.setBounds(game.getWidth() / 2 - 145, game.getHeight() / 2 - 50, 300, 100);
+      game.add(gLMsg);
+      game.updateUI();
+      break;
+    case "TIE":
+      gameActive = false;
+      GameMsg gTMsg = new GameMsg("Tie");
+      gTMsg.setBounds(game.getWidth() / 2 - 145, game.getHeight() / 2 - 50, 300, 100);
+      game.add(gTMsg);
+      game.updateUI();
       break;
     case "TIME":
 
@@ -84,7 +98,10 @@ public class ClientGM {
       break;
     case "ERROR":
     case "QUIT":
-      System.exit(1);
+      GameMsg gQMsg = new GameMsg("Opponent Left");
+      gQMsg.setBounds(game.getWidth() / 2 - 145, game.getHeight() / 2 - 50, 300, 100);
+      game.add(gQMsg);
+      game.updateUI();
       break;
     default:
       game.board.timer = 0;
