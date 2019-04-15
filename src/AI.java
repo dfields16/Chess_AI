@@ -1,4 +1,3 @@
-
 public class AI {
 
     int depth = 1;
@@ -19,96 +18,11 @@ public class AI {
 
       level = -1;
       maxFunAB( new Board(board), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-
+      //if(Util.validMove(board, best))
       return best;
+    //  else return null;
     }
 
-    public double maxFun(Board board){
-
-      level++;
-
-      double  val = Double.NEGATIVE_INFINITY;
-      double tval = val;
-
-      if(level==depth) return heuristic(board);
-
-      // FIND PIECES ON MY SIDE
-      for(int y1 = 0; y1 < board.len('y'); y1++){
-      for(int x1 = 0; x1 < board.len('x'); x1++){
-
-        //FIND SPACES IT CAN MOVE
-        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == board.turn){
-        for(int y2 = 0; y2 < board.len('y'); y2++){
-        for(int x2 = 0; x2 < board.len('x'); x2++){
-
-          Move move = new Move(x1,y1,x2,y2);
-          b    = new Board(board);
-
-          if( Util.movePiece(b,move) ){
-
-            b.turn = (b.turn==0) ? 1 : 0;
-
-            val = minFun(b);
-
-            if(val>tval) {
-              tval = val;
-              best = move;
-            }
-
-          }
-
-        }
-        }
-        }
-
-      }
-      }
-
-      return val;
-    }
-
-    public double minFun(Board board){
-
-      double  val = Double.POSITIVE_INFINITY;
-      double bval = val;
-
-      if(level==depth) return heuristic(board);
-
-      // FIND PIECES ON MY SIDE
-      for(int y1 = 0; y1 < board.len('y'); y1++){
-      for(int x1 = 0; x1 < board.len('x'); x1++){
-
-        //FIND SPACES IT CAN MOVE
-        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == board.turn){
-        for(int y2 = 0; y2 < board.len('y'); y2++){
-        for(int x2 = 0; x2 < board.len('x'); x2++){
-
-          Move move = new Move(x1,y1,x2,y2);
-          b    = new Board(board);
-
-          if( Util.movePiece(b,move) ){
-
-            b.turn = (b.turn==0) ? 1 : 0;
-
-            val = maxFun(b);
-
-            level --;
-
-            if(val<bval) {
-              bval = val;
-            }
-
-          }
-
-        }
-        }
-        }
-
-      }
-      }
-
-      return val;
-    }
 
     public double maxFunAB(Board board, double alpha, double beta){
 
@@ -117,7 +31,7 @@ public class AI {
       double  val = Double.NEGATIVE_INFINITY;
       double tval = val;
 
-      if(level==depth) return heuristic(board);
+      if(level==depth && Util.getKing(board, 0) != null && Util.getKing(board, 1)!= null) return heuristic(board);
 
       // FIND PIECES ON MY SIDE
       for(int y1 = 0; y1 < board.len('y'); y1++){
@@ -139,17 +53,20 @@ public class AI {
 
             if(val>tval) {
               tval = val;
-              best = move;
+              if(level == 0)
+            	  best = move;
+            }
+            
+            if (val > beta) {
+                return val;
+              }
+            if (val > alpha) {
+                alpha = val;
             }
 
           }
 
-          if (val > beta) {
-            return val;
-          }
-          if (val > alpha) {
-            alpha = val;
-          }
+          
 
 
         }
@@ -192,14 +109,15 @@ public class AI {
             if(val<bval) {
               bval = val;
             }
+            if (val < alpha) {
+                return val;
+              }
+              if (val < beta) {
+                beta = val;
+              }
 
           }
-          if (val < alpha) {
-            return val;
-          }
-          if (val < beta) {
-            beta = val;
-          }
+          
 
         }
         }

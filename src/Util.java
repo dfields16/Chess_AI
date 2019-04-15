@@ -81,7 +81,7 @@ public class Util {
     Square king = getKing(board,board.turn);
     Move m;
 
-    System.out.println(board.active + " checking for: " + king.piece.side);
+//    System.out.println(board.active + " checking for: " + king.piece.side);
 
     if(king.piece != null) {
 
@@ -90,7 +90,7 @@ public class Util {
       if (board.piece(x,y) != null && board.piece(x,y).side != board.turn) {
           m = new Move(board.coord(x,y),king.coord);
           if(validMove(board,m)) {
-            System.out.println("cant move in check");
+//            System.out.println("cant move in check");
             return true;
           }
       }
@@ -129,7 +129,7 @@ public class Util {
 
   public static boolean movePiece(Board board, Move move){
 
-    if( !validMove(board,move) ) {
+    if( !validMove(board,move) || inCheck(board, move)) {
       board.valid = false;
       return false;
     }else {
@@ -149,32 +149,6 @@ public class Util {
 
   }
 
-//  public static ArrayList<Move> potentialMoves(Square[][] presentState, int side) {
-//      ArrayList<Move> foundMoves = new ArrayList<Move>();
-//
-//      for (int y = 0; y < 8; y++) {
-//          for (int x = 0; x < 8; x++) {
-//              Piece p = presentState[y][x].piece;
-//              if (p != null && p.side == side) {
-//                  for (int y2 = 0; y2 < 8; y2++) {
-//                      for (int x2 = 0; x2 < 8; x2++) {
-//                          if (x == x2 && y == y2)
-//                              continue;
-//                          if (presentState[y2][x2].piece == null || presentState[y2][x2].piece.side != side) {
-//                              Move testMove = new Move(new Point(x, y), new Point(x2, y2));
-//
-//                              if (Util.validMove(presentState, testMove, side)) {
-//                                  foundMoves.add(testMove);
-//                              }
-//                          }
-//                      }
-//                  }
-//              }
-//          }
-//      }
-//
-//      return foundMoves;
-//  }
 
   public static boolean checkCapture(Board board, Move move){
       if (board.piece(move.x2(),move.y2()) != null) {
@@ -265,7 +239,7 @@ public class Util {
       // MOVING INTO CHECK?
 
       if(start.side == board.turn && board.active == 1){
-        System.out.println("doing check");
+        //System.out.println("doing check");
         if( inCheck(board,move) ) valid = false;
       }
 
