@@ -8,7 +8,7 @@ public class ClientGM {
   private TimerTask recieveDataTask, gameTimer;
   private Timer clientTimer, clock;
   private Game game;
-  public int team;
+  public int team = -1;
   private String m1, m2;
   public boolean gameActive = false;
   public boolean isSinglePlayer = false;
@@ -64,9 +64,11 @@ public class ClientGM {
       }
       break;
     case "INFO":
-      game.board.turnlen = Integer.parseInt(data[1]);
-      team = (data[2].equals("White")) ? 0 : 1;
-      client.sendData("READY");
+      if (team == -1) {
+        game.board.turnlen = Integer.parseInt(data[1]);
+        team = (data[2].equals("White")) ? 0 : 1;
+        client.sendData("READY");
+      }
       break;
     case "ILLEGAL":
       break;
@@ -113,6 +115,7 @@ public class ClientGM {
       break;
     default:
       game.board.timer = 0;
+      System.out.println(data[0] + " " + data[1]);
       Util.movePiece(game.board, Move.deserialize(data[0] + " " + data[1]));
       game.board.nextTurn();
       if (cpu != null && game.board.turn == team && gameActive) {

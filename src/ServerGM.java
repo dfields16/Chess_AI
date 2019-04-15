@@ -61,8 +61,6 @@ public class ServerGM {
 
   public void isGameOver(Move move) throws IOException {
     Board bored = new Board(board);
-    bored.turn = (bored.turn == 0) ? 1 : 0;
-    bored.timer = 1;
     Move hint = human.getMove(bored);
 
     if (hint == null) {

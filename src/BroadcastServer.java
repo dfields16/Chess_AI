@@ -21,11 +21,11 @@ public class BroadcastServer {
         if (args.length > 0) {
             if (args[0] == "singlePlayer")
                 singlePlayer = true;
-            else if(args.length == 2){
+            else if (args.length == 2) {
                 port = Integer.valueOf(args[0]);
                 timeLimit = Integer.valueOf(args[1]);
             }
-        }else{
+        } else {
             System.out.println("To start with args use the following: ");
             System.out.println("java -jar <jarName> <port> <timeLimit>");
         }
@@ -119,6 +119,9 @@ public class BroadcastServer {
         try {
             ServerGM game = games.get(client.game);
             switch (data[0]) {
+            case "CHECKMATE":
+
+                break;
             case "OK":
                 // IDK
                 break;
@@ -164,7 +167,6 @@ public class BroadcastServer {
                     client.out.writeObject("OK");
                     if (game.ai) {
                         Move aiMove = game.aiTurn();
-                        System.out.println("[DeleteMe]" + aiMove.serialize());
                         game.board.nextTurn();
                         if (client.name.equals("1")) {
                             game.c1.out.writeObject(aiMove.serialize());
@@ -172,6 +174,7 @@ public class BroadcastServer {
                             game.c0.out.writeObject(aiMove.serialize());
                         }
                     }
+                    game.isGameOver(move);
                     if (Util.getKing(game.board, game.board.turn) == null) {
                         client.out.writeObject("WINNER");
                         if (client.name.equals("0")) {
@@ -233,12 +236,12 @@ public class BroadcastServer {
                             quit(client.socket.getInetAddress(), false);
                             return;
                         }
-                        System.out.println("[" + client.name + "] " + msg);
+                        System.out.println("[" + client.game + "][" + client.name + "] " + msg);
                         gameEngine(client, msg.split(" "));
                     }
                 }
             } catch (IOException | ClassNotFoundException e1) {
-                System.out.println("[Disconnect] " + client.name);
+                System.out.println("[" + client.game +"][Disconnect]" + client.name);
                 try {
                     if (games.get(client.game).c0 == client) {
                         games.get(client.game).c1.out.writeObject("QUIT");
