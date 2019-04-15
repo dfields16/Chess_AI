@@ -93,28 +93,31 @@ class Game extends JPanel {
         if (click.end != null) click.clear();
         if(!client.gameActive)return;
         // SEE IF A SQUARE WAS CLICKED
-        for (int y = 0; y < 8; y++){
-          for (int x = 0; x < 8; x++){
-            // if an initial square is selected set to start or start over if already
-            // selected
-            if( board.shape(x,y).contains(e.getPoint()) && click.start == board.coord(x,y)){
-              // do nothing because validator below will catch it
-            }else if (board.in(x,y,e.getPoint()) && click.start == null && board.piece(x,y) != null &&
-                      board.piece(x,y).side == board.turn && board.piece(x,y).side == client.team)
-            {
-              click.start = new Point(x, y);
-              valid = true;
-              // if a start has already been selected set the destination
-            }else if( board.in(x,y,e.getPoint()) && click.start != null){
-              click.end = new Point(x, y);
+        for(int y = 0; y < 8; y++){
+        for(int x = 0; x < 8; x++){
 
-              client.sendMove(click);
-              // System.out.println(board.turn);
+          // if an initial square is selected set to start or start over if already selected
+          if( board.shape(x,y).contains(e.getPoint()) && click.start == board.coord(x,y)){
 
-              valid = false;
-            }
+            // do nothing because validator below will catch it
 
+          }else if (board.in(x,y,e.getPoint()) && click.start == null && board.piece(x,y) != null && board.piece(x,y).side == board.turn && board.piece(x,y).side == client.team)
+          {
+
+            click.start = new Point(x, y);
+            valid = true;
+
+          // if a start has already been selected set the destination as long as not itself
+          }else if( board.in(x,y,e.getPoint()) && click.start != null ){
+
+            click.end = new Point(x, y);
+            // System.out.println(click.start + " " + click.end);
+            if( !(click.x1() == click.x2() && click.y1() == click.y2()) )client.sendMove(click);
+
+            valid = false;
           }
+
+        }
         }
 
         // if something other than square was clicked
@@ -195,8 +198,8 @@ class Game extends JPanel {
         // g2.setColor(toggle == 1 ? Color.decode("#603f2f") : Color.decode("#dfa070")
         // );
 
-        if (board.coord(x,y).equals(click.start))
-          g2.setColor(Color.decode("#003366"));
+        if (board.coord(x,y).equals(click.start)) g2.setColor(Color.decode("#003366"));
+        if (board.piece(x,y) != null && board.piece(x,y).checked == 1) g2.setColor(Color.decode("#CC0000"));
         g2.fill(board.shape(x,y));
 
         toggle = toggle == 0 ? 1 : 0;

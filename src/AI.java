@@ -1,72 +1,59 @@
-import java.util.ArrayList;
-import java.util.Random;
 
 public class AI {
 
-    //what side are we trying to play for
-    int side;
+    int depth = 1;
+    int level;
 
-    int depth;
-    int level = 0;
+    Board b;
+    Move  best;
 
-    Move best;
+    public AI(){}
 
     public AI(int skill){
-      depth = skill;
+      depth = (skill < 1 || skill > 5) ? 1 : skill;
     }
 
-    public Move getMove(Board b, int s){
+    public Move getMove(Board board){
 
-      side  = s;
-      best  = null;
+      best  = new Move();
 
-      bestMove( new Board(b) );
+      level = -1;
+      maxFun( new Board(board) );
 
       return best;
     }
 
-    public int bestMove(Board board){
-
-      Move move;
+    public double maxFun(Board board){
 
       level++;
 
-      int score = -1000000;
-      int val   = 0;
+      double  val = Double.NEGATIVE_INFINITY;
+      double tval = val;
+
+      if(level==depth) return heuristic(board);
 
       // FIND PIECES ON MY SIDE
       for(int y1 = 0; y1 < board.len('y'); y1++){
       for(int x1 = 0; x1 < board.len('x'); x1++){
 
-        // found one
-        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == side){
         //FIND SPACES IT CAN MOVE
+        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == board.turn){
         for(int y2 = 0; y2 < board.len('y'); y2++){
         for(int x2 = 0; x2 < board.len('x'); x2++){
 
-          move = new Move(x1,y1,x2,y2);
+          Move move = new Move(x1,y1,x2,y2);
+          b    = new Board(board);
 
-          Board tmp = new Board(board);
+          if( Util.movePiece(b,move) ){
 
-          //IF WE HAVE A VALID MOVE GO DOWN THE RABBIT HOLE
-          if( Util.movePiece(tmp,move,side) ){
+            b.turn = (b.turn==0) ? 1 : 0;
 
-            // GOING DEEPER OR GETTING A SCORE
-            if(level<=depth){
-              val = bestMove(tmp);
-              level--;
-            }else {
-              val = heuristic(tmp);
+            val = minFun(b);
+
+            if(val>tval) {
+              tval = val;
+              best = move;
             }
-
-            // PROCESS THE SCORE AND MOVE
-            if(val > score){
-              score = val;
-              best  = move;
-            }
-
-            // print(tmp);
-            // System.out.println(score);
 
           }
 
@@ -77,30 +64,54 @@ public class AI {
       }
       }
 
-    return score;
+      return val;
     }
 
-    public Move maxFun(Square[][] board, int depth, int maxDepth){
-      Move move = null;
-      return move;
+    public double minFun(Board board){
+
+      double  val = Double.POSITIVE_INFINITY;
+      double bval = val;
+
+      if(level==depth) return heuristic(board);
+
+      // FIND PIECES ON MY SIDE
+      for(int y1 = 0; y1 < board.len('y'); y1++){
+      for(int x1 = 0; x1 < board.len('x'); x1++){
+
+        //FIND SPACES IT CAN MOVE
+        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == board.turn){
+        for(int y2 = 0; y2 < board.len('y'); y2++){
+        for(int x2 = 0; x2 < board.len('x'); x2++){
+
+          Move move = new Move(x1,y1,x2,y2);
+          b    = new Board(board);
+
+          if( Util.movePiece(b,move) ){
+
+            b.turn = (b.turn==0) ? 1 : 0;
+
+            val = maxFun(b);
+
+            level --;
+
+            if(val<bval) {
+              bval = val;
+            }
+
+          }
+
+        }
+        }
+        }
+
+      }
+      }
+
+      return val;
     }
 
-    public Move minFun(Square[][] board, int depth, int maxDepth){
-      Move move = null;
-      return move;
-    }
+    private int heuristic(Board board){
 
-    public void setState(Square[][] squares) {
-        // clear();
-        // state = squares;
-    }
-
-    public Move bestMove(ArrayList<Move> moves, boolean bestWorst) {
-      Move move = null;
-      return move;
-    }
-
-    private int heuristic(Board board) {
       int val = 0;
       int mod = 1;
 
@@ -111,7 +122,7 @@ public class AI {
           if(x > 1 && x < 6 && y > 1 && y < 6) mod = 2;
           if((x == 4 || x == 5) && (y == 4 || y == 5)) mod = 3;
 
-          if (board.piece(x,y).side == side) {
+          if (board.piece(x,y).side == board.turn) {
             val += p.type.value + p.type.moveValue*mod;
           } else {
             val -= p.type.value + p.type.moveValue*mod;
@@ -143,54 +154,59 @@ public class AI {
 
     }
 
-    public Move tmpMove(Board board){
-
-      Random rand = new Random();
-      int pc = 0;
-      int mc = 0;
+    public int bestMove(Board board){
 
       Move move;
-      Move fb = null;
 
-      for (int y1 = 0; y1 < board.len('y'); y1++){
-      for (int x1 = 0; x1 < board.len('x'); x1++){
+      level++;
 
-        // FIND A PIECE ON MY SIDE
-        if(board.piece(x1,y1) != null && board.piece(x1,y1).side == side){
+      int score = -1000000;
+      int val   = 0;
 
-          pc++;
+      // FIND PIECES ON MY SIDE
+      for(int y1 = 0; y1 < board.len('y'); y1++){
+      for(int x1 = 0; x1 < board.len('x'); x1++){
 
-          System.out.println("piece: " + board.piece(x1,y1).type + " " + board.piece(x1,y1).side);
+        //FIND SPACES IT CAN MOVE
+        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == board.turn){
 
-          if(rand.nextInt(2) > 0 | pc>10){
-            //FIND A SPACE IT CAN MOVE
-            for (int y2 = 0; y2 < board.len('y'); y2++) {
-            for (int x2 = 0; x2 < board.len('x'); x2++) {
+        for(int y2 = 0; y2 < board.len('y'); y2++){
+        for(int x2 = 0; x2 < board.len('x'); x2++){
 
-              move = new Move(x1,y1,x2,y2);
-              fb   = new Move(x1,y1,x2,y2);
+          move = new Move(x1,y1,x2,y2);
 
-              //IF WE HAVE A VALID MOVE BLINDLY RETURN IT
-              if(Util.validMove(board.squares, move, side)){
+          Board tmp = new Board(board);
 
-                mc++;
+          //IF WE HAVE A VALID MOVE GO DOWN THE RABBIT HOLE
+          if( Util.movePiece(tmp,move) ){
 
-                if(rand.nextInt(2) > 0 | mc>2){
-                  return new Move(x1,y1,x2,y2);
-                }
-              }
-
+            // GOING DEEPER OR GETTING A SCORE
+            if(level<=depth){
+              val = bestMove(tmp);
+              level--;
+            }else {
+              val = heuristic(tmp);
             }
+
+            // PROCESS THE SCORE AND MOVE
+            if(val > score){
+              score = val;
+              best  = move;
             }
+
+            //print(tmp);
+            //System.out.println(score);
 
           }
+
+        }
+        }
+
         }
 
       }
       }
 
-      print(board);
-
-      return fb;
+    return score;
     }
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class BroadcastServer {
     ServerSocket serverSocket;
-    public static long timeLimit = 20;
+    public static long timeLimit = 60;
     private static Map<Integer, ServerGM> games = new HashMap<>();
     private static ArrayList<Client> clients = new ArrayList<>();
     private static boolean singlePlayer = false;
@@ -138,12 +138,12 @@ public class BroadcastServer {
                 Move move = Move.deserialize(data[0] + " " + data[1]);
                 boolean valid = false;
                 if (game.board.turn == Integer.parseInt(client.name)) {
-                    valid = Util.validMove(game.board.squares, move, game.board.turn);
+                    valid = Util.validMove(game.board, move);
                 }
                 if (valid) {
                     System.out.print("[Move][Valid] " + move.serialize() + "\n");
                     game.board.timer = 0;
-                    Util.movePiece(game.board, move, game.board.turn);
+                    Util.movePiece(game.board, move);
                     game.board.nextTurn();
                     if (client.name.equals("0") && !game.ai) {
                         game.c1.out.writeObject(data[0] + " " + data[1]);

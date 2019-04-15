@@ -18,8 +18,11 @@ class Board implements Serializable{
   int checked = 0;
   int mated   = 0;
 
+  int active  = 0;
+
   Board(Board board){
 
+    active  = 0;
     valid   = board.valid;
     checked = board.checked;
     mated   = board.mated;
@@ -64,7 +67,7 @@ class Board implements Serializable{
 
   }
 
-  public int len(char a) {
+  public int len(char a){
 
     int s = 0;
 

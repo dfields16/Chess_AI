@@ -59,7 +59,7 @@ public class ServerGM {
 
   public Board makeMove(Move move) {
 
-    if (Util.movePiece(board, move, board.turn)) {
+    if (Util.movePiece(board, move)) {
 
       board.turn = (board.turn == 0) ? 1 : 0;
       board.timer = 1;
@@ -76,9 +76,9 @@ public class ServerGM {
   }
 
   public Move aiTurn() {
-    Move move = cpu.getMove(board, board.turn);
+    Move move = cpu.getMove(board);
     if (move != null)
-      Util.movePiece(board, move, board.turn);
+      Util.movePiece(board, move);
     // board.turn = (board.turn == 0) ? 1 : 0;
     return move;
   }

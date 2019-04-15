@@ -50,8 +50,7 @@ public class ClientGM {
     switch (data[0]) {
     case "OK":
       if (m1 != m2 && !isSinglePlayer) {
-        Util.print(game.board.squares);
-        Util.movePiece(game.board, Move.deserialize(m1), game.board.turn);
+        Util.movePiece(game.board, Move.deserialize(m1));
         game.board.nextTurn();
         m2 = m1;
         game.board.timer = 0;
@@ -87,7 +86,7 @@ public class ClientGM {
       break;
     default:
       game.board.timer = 0;
-      Util.movePiece(game.board, Move.deserialize(data[0] + " " + data[1]), game.board.turn);
+      Util.movePiece(game.board, Move.deserialize(data[0] + " " + data[1]));
       game.board.nextTurn();
       break;
     }
