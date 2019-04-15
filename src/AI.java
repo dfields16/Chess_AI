@@ -18,7 +18,7 @@ public class AI {
       best  = new Move();
 
       level = -1;
-      maxFun( new Board(board) );
+      maxFunAB( new Board(board), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
       return best;
     }
@@ -109,6 +109,108 @@ public class AI {
 
       return val;
     }
+
+    public double maxFunAB(Board board, double alpha, double beta){
+
+      level++;
+
+      double  val = Double.NEGATIVE_INFINITY;
+      double tval = val;
+
+      if(level==depth) return heuristic(board);
+
+      // FIND PIECES ON MY SIDE
+      for(int y1 = 0; y1 < board.len('y'); y1++){
+      for(int x1 = 0; x1 < board.len('x'); x1++){
+
+        //FIND SPACES IT CAN MOVE
+        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == board.turn){
+        for(int y2 = 0; y2 < board.len('y'); y2++){
+        for(int x2 = 0; x2 < board.len('x'); x2++){
+
+          Move move = new Move(x1,y1,x2,y2);
+          b    = new Board(board);
+
+          if( Util.movePiece(b,move) ){
+
+            b.turn = (b.turn==0) ? 1 : 0;
+
+            val = minFunAB(b, alpha, beta);
+
+            if(val>tval) {
+              tval = val;
+              best = move;
+            }
+
+          }
+
+          if (val > beta) {
+            return val;
+          }
+          if (val > alpha) {
+            alpha = val;
+          }
+
+
+        }
+        }
+        }
+
+      }
+      }
+
+      return val;
+    }
+
+    public double minFunAB(Board board, double alpha, double beta){
+
+      double  val = Double.POSITIVE_INFINITY;
+      double bval = val;
+
+      if(level==depth) return heuristic(board);
+
+      // FIND PIECES ON MY SIDE
+      for(int y1 = 0; y1 < board.len('y'); y1++){
+      for(int x1 = 0; x1 < board.len('x'); x1++){
+
+        //FIND SPACES IT CAN MOVE
+        if( board.piece(x1,y1) != null && board.piece(x1,y1).side == board.turn){
+        for(int y2 = 0; y2 < board.len('y'); y2++){
+        for(int x2 = 0; x2 < board.len('x'); x2++){
+
+          Move move = new Move(x1,y1,x2,y2);
+          b    = new Board(board);
+
+          if( Util.movePiece(b,move) ){
+
+            b.turn = (b.turn==0) ? 1 : 0;
+
+            val = maxFunAB(b, alpha, beta);
+
+            level --;
+
+            if(val<bval) {
+              bval = val;
+            }
+
+          }
+          if (val < alpha) {
+            return val;
+          }
+          if (val < beta) {
+            beta = val;
+          }
+
+        }
+        }
+        }
+
+      }
+      }
+
+      return val;
+    }
+
 
     private int heuristic(Board board){
 

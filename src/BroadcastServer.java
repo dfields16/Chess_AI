@@ -17,8 +17,9 @@ public class BroadcastServer {
 
     public static void main(String args[]) {
         BroadcastServer server = new BroadcastServer();
-        if(args.length > 0){
-            if(args[0] == "singlePlayer")singlePlayer = true;
+        if (args.length > 0) {
+            if (args[0] == "singlePlayer")
+                singlePlayer = true;
         }
         try {
             server.startServer(1200);
@@ -67,7 +68,7 @@ public class BroadcastServer {
             ClientHandler cl = new ClientHandler(clients.get(clients.size() - 1));
             Thread clientThread = new Thread(cl);
             clientThread.start();
-            if(singlePlayer) {
+            if (singlePlayer) {
                 games.get(c.game).ai = true;
                 break;
             }
@@ -125,12 +126,14 @@ public class BroadcastServer {
                         }
                         startGame = true;
                     }
-                }else if(game.ai){
+                } else if (game.ai) {
                     startGame = true;
                 }
                 if (startGame) {
-                    if(game.c0 != null)game.c0.out.writeObject("BEGIN");
-                    if(game.c1 != null)game.c1.out.writeObject("BEGIN");
+                    if (game.c0 != null)
+                        game.c0.out.writeObject("BEGIN");
+                    if (game.c1 != null)
+                        game.c1.out.writeObject("BEGIN");
                     game.board.timer = 0;
                 }
                 break;
@@ -151,7 +154,7 @@ public class BroadcastServer {
                         game.c0.out.writeObject(data[0] + " " + data[1]);
                     }
                     client.out.writeObject("OK");
-                    if(game.ai){
+                    if (game.ai) {
                         Move aiMove = game.aiTurn();
                         System.out.println("[DeleteMe]" + aiMove.serialize());
                         game.board.nextTurn();
@@ -159,6 +162,14 @@ public class BroadcastServer {
                             game.c1.out.writeObject(aiMove.serialize());
                         } else {
                             game.c0.out.writeObject(aiMove.serialize());
+                        }
+                    }
+                    if (Util.getKing(game.board, game.board.turn) == null) {
+                        client.out.writeObject("WINNER");
+                        if (client.name.equals("0")) {
+                            game.c1.out.writeObject("LOSER");
+                        } else {
+                            game.c0.out.writeObject("LOSER");
                         }
                     }
                 } else {

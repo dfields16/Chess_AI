@@ -66,9 +66,11 @@ public class ClientGM {
       break;
     case "WINNER":
       gameActive = false;
+
       break;
     case "LOSER":
       gameActive = false;
+
       break;
     case "TIME":
 

@@ -49,7 +49,7 @@ public class Util {
 
     Move m;
 
-    if(mking.piece != null && tking.piece != null) {
+    if(mking != null && tking != null) {
 
       mking.piece.checked = 0;
 
