@@ -13,7 +13,12 @@ public class ClientGM {
   public boolean gameActive = false;
   public boolean isSinglePlayer = false;
 
-  public ClientGM(Game gm, InetAddress ip, int port) {
+  public AI cpu = null;
+
+  public ClientGM(Game gm, InetAddress ip, int port, boolean isAI) {
+    if (isAI) {
+      cpu = new AI(1);
+    }
     game = gm;
     m1 = m2 = "";
 
@@ -93,20 +98,26 @@ public class ClientGM {
       break;
     case "BEGIN":
       game.board.timer = 0;
-      game.updateUI();
+      if (cpu != null && game.board.turn == team && !gameActive) {
+        sendMove(aiTurn());
+      }
       gameActive = true;
       break;
     case "ERROR":
     case "QUIT":
-      GameMsg gQMsg = new GameMsg("Opponent Left");
-      gQMsg.setBounds(game.getWidth() / 2 - 145, game.getHeight() / 2 - 50, 300, 100);
-      game.add(gQMsg);
+      GameMsg qGMsg = new GameMsg("Opponent Left");
+      qGMsg.setBounds(game.getWidth() / 2 - 145, game.getHeight() / 2 - 50, 300, 100);
+      game.add(qGMsg);
       game.updateUI();
+      gameActive = false;
       break;
     default:
       game.board.timer = 0;
       Util.movePiece(game.board, Move.deserialize(data[0] + " " + data[1]));
       game.board.nextTurn();
+      if (cpu != null && game.board.turn == team && gameActive) {
+        sendMove(aiTurn());
+      }
       break;
     }
   }
@@ -116,4 +127,8 @@ public class ClientGM {
     client.sendData(m1);
   }
 
+  public Move aiTurn() {
+    Move move = cpu.getMove(game.board);
+    return move;
+  }
 }

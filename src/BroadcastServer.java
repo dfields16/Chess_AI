@@ -17,12 +17,20 @@ public class BroadcastServer {
 
     public static void main(String args[]) {
         BroadcastServer server = new BroadcastServer();
+        int port = 1200;
         if (args.length > 0) {
             if (args[0] == "singlePlayer")
                 singlePlayer = true;
+            else if(args.length == 2){
+                port = Integer.valueOf(args[0]);
+                timeLimit = Integer.valueOf(args[1]);
+            }
+        }else{
+            System.out.println("To start with args use the following: ");
+            System.out.println("java -jar <jarName> <port> <timeLimit>");
         }
         try {
-            server.startServer(1200);
+            server.startServer(port);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -28,7 +28,8 @@ class Game extends JPanel {
 
   public Game(String IPAddress, int portNo, int depth) {
 	  try {
-	      client = new ClientGM(this, InetAddress.getByName(IPAddress), portNo);
+        client = new ClientGM(this, InetAddress.getByName(IPAddress), portNo, true);
+        client.cpu.depth = depth;
 	    } catch (UnknownHostException e) {
 	      e.printStackTrace();
 	    }
@@ -39,7 +40,7 @@ class Game extends JPanel {
 
   public Game(String IPAddress, int portNo) {
 	  try {
-	      client = new ClientGM(this, InetAddress.getByName(IPAddress), portNo);
+	      client = new ClientGM(this, InetAddress.getByName(IPAddress), portNo, false);
 	    } catch (UnknownHostException e) {
 	      e.printStackTrace();
 	    }
@@ -50,7 +51,7 @@ class Game extends JPanel {
 
   public Game() {
     try {
-      client = new ClientGM(this, InetAddress.getByName("localhost"), 1200);
+      client = new ClientGM(this, InetAddress.getByName("localhost"), 1200, false);
       client.isSinglePlayer = true;
     } catch (UnknownHostException e) {
       e.printStackTrace();
